@@ -1,0 +1,136 @@
+\documentclass[11pt]{article}
+
+% ====================================================
+% PACKAGES
+% ====================================================
+\usepackage[margin=1in, headheight=13.6pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{tcolorbox}
+\usepackage{amsmath, amssymb, mathtools}
+\usepackage{siunitx}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\usepackage{listings}
+\usepackage{indentfirst}
+\usepackage[justification=centering]{caption}
+
+% Python source style for \CodeListing
+\lstdefinestyle{pystyle}{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue!60!black}\bfseries,
+    stringstyle=\color{orange!70!black},
+    commentstyle=\color{gray!60!black}\itshape,
+    numbers=left,
+    numberstyle=\tiny\color{gray!70},
+    numbersep=8pt,
+    breaklines=true,
+    showstringspaces=false,
+    frame=single,
+    rulecolor=\color{gray!40},
+    tabsize=4,
+    columns=fullflexible,
+    captionpos=b,
+    literate={°}{{\textdegree}}1,
+}
+\lstset{style=pystyle}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\Assignment\ |\ \course}
+\rhead{\Name\ |\ \today}
+\cfoot{Page \thepage\ of~\pageref{LastPage}}
+
+\hypersetup{
+    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
+\newcommand{\Name}{Arael Anaya}
+\newcommand{\Assignment}{Homework 7}
+\newcommand{\course}{Advanced Dynamics}
+
+% Boxed final-answer environment
+\newtcolorbox{result}{
+    colback=blue!3!white,
+    colframe=blue!40!black,
+    boxrule=0.6pt,
+    arc=2pt,
+    left=6pt, right=6pt, top=4pt, bottom=4pt
+}
+
+% Code listing: sources the .py file directly.
+\newcommand{\CodeListing}[3]{%
+\IfFileExists{#1}%
+    {\lstinputlisting[style=pystyle,caption={#2},label={#3}]{#1}}%
+    {\begin{quote}\itshape Source file \texttt{#1} not found yet --- this
+        listing will populate automatically once the file is written.\end{quote}}}
+
+\begin{document}
+
+% ====================================================
+% PROBLEM 1
+% ====================================================
+\section*{Problem 1}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 1.png}
+\end{figure}
+
+
+% ====================================================
+% PROBLEM 2
+% ====================================================
+\newpage
+\section*{Problem 2}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 2.png}
+\end{figure}
+
+
+% ====================================================
+% PROBLEM 4
+% ====================================================
+\newpage
+\section*{Problem 3}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 3.png}
+\end{figure}
+
+
+% ====================================================
+% APPENDIX
+% ====================================================
+\newpage
+\appendix
+\section*{Appendix: Code Listings}
+
+\subsection*{Problem 1 Code}
+\CodeListing{../code/Problem1.py}{INSERT .}{lst:p3}
+
+\end{document}

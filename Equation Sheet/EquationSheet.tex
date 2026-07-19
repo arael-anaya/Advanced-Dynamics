@@ -1,0 +1,409 @@
+\documentclass[10pt]{article}
+
+% ====================================================
+% PACKAGES
+% ====================================================
+\usepackage[margin=0.5in, headheight=13.6pt, columnsep=20pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{tcolorbox}
+\usepackage{amsmath, amssymb, mathtools}
+\usepackage{siunitx}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\usepackage{listings}
+\usepackage{indentfirst}
+\usepackage[justification=centering]{caption}
+
+\usepackage{multicol}
+\usepackage{titlesec}
+
+% Python source style for \CodeListing
+\lstdefinestyle{pystyle}{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue!60!black}\bfseries,
+    stringstyle=\color{orange!70!black},
+    commentstyle=\color{gray!60!black}\itshape,
+    numbers=left,
+    numberstyle=\tiny\color{gray!70},
+    numbersep=8pt,
+    breaklines=true,
+    showstringspaces=false,
+    frame=single,
+    rulecolor=\color{gray!40},
+    tabsize=4,
+    columns=fullflexible,
+    captionpos=b,
+    literate={°}{{\textdegree}}1,
+}
+\lstset{style=pystyle}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\Assignment\ |\ \course}
+\rhead{\Name\ |\ \today}
+\cfoot{Page \thepage\ of~\pageref{LastPage}}
+
+\hypersetup{
+    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
+\newcommand{\Name}{Arael Anaya}
+\newcommand{\Assignment}{Equation Sheet}
+\newcommand{\course}{Advanced Dynamics}
+
+% Boxed key-formula environment (tight padding for cheat-sheet density)
+\newtcolorbox{keybox}{
+    colback=blue!4!white,
+    colframe=blue!45!black,
+    boxrule=0.5pt,
+    arc=1pt,
+    left=4pt, right=4pt, top=1pt, bottom=1pt,
+    before skip=2pt, after skip=2pt
+}
+
+% Compact section/subsection formatting
+\titleformat{\section}{\normalfont\bfseries\large\color{blue!40!black}}{}{0em}{}[{\color{blue!40!black}\titlerule[0.8pt]}]
+\titlespacing*{\section}{0pt}{4pt}{1pt}
+\titleformat{\subsection}{\normalfont\bfseries\color{blue!25!black}}{}{0em}{}
+\titlespacing*{\subsection}{0pt}{2pt}{1pt}
+
+\setlength{\columnseprule}{0.4pt}
+\def\columnseprulecolor{\color{gray!40}}
+\setlength{\multicolsep}{2pt}
+\setlength{\parskip}{0pt}
+
+% Notation shorthand
+\newcommand{\rate}[2]{{}^{#1}\dfrac{d}{dt}#2}
+
+\begin{document}
+\thispagestyle{fancy}
+\begin{center}
+    {\Large\bfseries Advanced Dynamics --- Equation Sheet}\\[1pt]
+    {\small Kinematics \(\cdot\) Newton's Laws \(\cdot\) Energy \& Momentum \(\cdot\) Generalized Coordinates \& Constraints \(\cdot\) D'Alembert's Principle}
+\end{center}
+\vspace{-8pt}
+
+\begin{multicols}{2}
+\footnotesize
+
+% ====================================================
+% NOTATION
+% ====================================================
+\section*{Notation}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item $N, A, B,\dots$ --- reference frames (e.g.\ $N$ = fixed/inertial)
+    \item $\hat n_i, \hat a_i, \hat b_i$ --- right-handed unit-vector basis fixed in $N,A,B$
+    \item $\vec r_{P/O}$ --- position of point $P$ relative to point $O$; $\vec r\equiv{}^{N}\vec r$ unless noted otherwise
+    \item ${}^{N}\vec v_P,\ {}^{N}\vec a_P$ --- velocity/acceleration of $P$ \emph{as seen from} $N$
+    \item $\vec\omega^{A/N}$ --- angular velocity of frame $A$ relative to $N$
+    \item $\vec\alpha^{A/N} = {}^{N}\dfrac{d}{dt}\vec\omega^{A/N}$ --- angular acceleration of $A$ relative to $N$
+    \item $\rate{N}{(\cdot)}$ --- time derivative taken \emph{by an observer fixed in} $N$
+    \item $[R]^{B/A}$ --- rotation (direction cosine) matrix: $\{\hat b\} = [R]^{B/A}\{\hat a\}$
+    \item $q_1,\dots,q_N$ --- generalized coordinates; $\vec\gamma_{ij}=\partial\vec r_i/\partial q_j$ --- partial velocities
+    \item $\vec P = m\vec v$ --- linear momentum; $\vec H_O=\vec r\times\vec P$ --- angular momentum about $O$
+\end{itemize}
+
+% ====================================================
+% ROTATIONS & ANGULAR VELOCITY
+% ====================================================
+\section*{Rotations \& Angular Velocity}
+
+\subsection*{Rotation matrices}
+Orthogonal, so $[R]^{-1} = [R]^{T}$; composing rotations through an intermediate frame $A$:
+\[
+    [R]^{B/N} = [R]^{B/A}[R]^{A/N}
+\]
+
+\subsection*{Angular velocity addition (chain rule)}
+Valid for any chain of intermediate frames:
+\begin{keybox}
+\[
+    \vec\omega^{B/N} = \vec\omega^{B/A} + \vec\omega^{A/N},
+    \qquad
+    \vec\omega^{C/N} = \vec\omega^{C/B}+\vec\omega^{B/A}+\vec\omega^{A/N}
+\]
+\end{keybox}
+Note the reversal/cancellation identities:
+\[
+    \vec\omega^{A/N} = -\vec\omega^{N/A}, \qquad \vec\omega^{A/A} = \vec 0
+\]
+
+\subsection*{Derivative of a rotating unit vector}
+If $\hat b_i$ is fixed in $B$ (constant length/orientation relative to $B$):
+\[
+    \rate{N}{\hat b_i} = \vec\omega^{B/N}\times\hat b_i
+\]
+
+\subsection*{2D rotation example ($N,P$ frames offset by $\alpha$)}
+\[
+    \hat n_1 = \hat p_1\cos\alpha+\hat p_2\sin\alpha, \qquad \hat n_2=-\hat p_1\sin\alpha+\hat p_2\cos\alpha
+\]
+\[
+    \begin{Bmatrix}\hat n_1\\\hat n_2\end{Bmatrix} = [R]^{N/P}\begin{Bmatrix}\hat p_1\\\hat p_2\end{Bmatrix},
+    \qquad
+    [R]^{N/P} = \begin{bmatrix}\cos\alpha&\sin\alpha\\-\sin\alpha&\cos\alpha\end{bmatrix}
+\]
+(written ${}^{N}R_P$ in lecture)
+\[
+    [R]^{P/N} = \big([R]^{N/P}\big)^{-1} = \big([R]^{N/P}\big)^{T} = \begin{bmatrix}\cos\alpha&-\sin\alpha\\\sin\alpha&\cos\alpha\end{bmatrix}
+\]
+
+% ====================================================
+% VECTOR DIFFERENTIATION FORMULA (VDF)
+% ====================================================
+\section*{Vector Differentiation Formula (VDF)}
+Also called the \emph{transport theorem}: for \emph{any} vector $\vec q$ (not necessarily fixed in either frame), relating the rate of change seen in $N$ to the rate of change seen in a frame $A$ rotating at $\vec\omega^{A/N}$:
+\begin{keybox}
+\[
+    \rate{N}{\vec q} = \rate{A}{\vec q} + \vec\omega^{A/N}\times\vec q
+\]
+\end{keybox}
+\textbf{Corollary:} if $\vec q$ is fixed in $A$ (i.e.\ $\rate{A}{\vec q}=0$), this reduces to $\rate{N}{\vec q}=\vec\omega^{A/N}\times\vec q$ (previous box). This is the tool used to differentiate a vector expressed in a rotating basis one component at a time.
+
+% ====================================================
+% POSITION VECTOR ADDITION
+% ====================================================
+\section*{Position Vector Addition (Setup for Moving Frames)}
+For two points $P$ and $O'$ both located relative to a common origin $O$ (equivalently $\vec r=\vec R+\vec r\,'$, with $\vec R=\vec r_{O'/O}$, $\vec r\,'=\vec r_{P/O'}$), position vectors add/subtract exactly like any vectors --- the basic relation used to move between frames whose origins differ:
+\begin{keybox}
+\[
+    \vec r_{P/O} = \vec r_{P/O'} + \vec r_{O'/O}
+    \qquad\Longleftrightarrow\qquad
+    \vec r_{P/O'} = \vec r_{P/O} - \vec r_{O'/O}
+\]
+\end{keybox}
+Chained over several intermediate points: $\vec r_{P/O} = \vec r_{P/B} + \vec r_{B/A} + \vec r_{A/O}$. Applying the VDF to this relation term-by-term is exactly how the velocity/acceleration relations below are derived.
+
+% ====================================================
+% TRANSLATING & ROTATING FRAMES --- VELOCITY
+% ====================================================
+\section*{Velocity: Translating \& Rotating Frames}
+Let $O'$ be the (moving) origin of frame $A$, which translates \emph{and} rotates ($\vec\omega^{A/N}$) relative to $N$, and let $P$ be an arbitrary point:
+\begin{keybox}
+\[
+    {}^{N}\vec v_P = {}^{N}\vec v_{O'} + {}^{A}\vec v_P + \vec\omega^{A/N}\times\vec r_{P/O'}
+\]
+\end{keybox}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item ${}^{N}\vec v_{O'}$ --- translational velocity of the moving origin
+    \item ${}^{A}\vec v_P = \rate{A}{\vec r_{P/O'}}$ --- velocity of $P$ \emph{relative to} $A$ (as seen by an observer riding on $A$)
+    \item $\vec\omega^{A/N}\times\vec r_{P/O'}$ --- velocity contribution from $A$'s rotation
+\end{itemize}
+\textbf{Special cases}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item Pure translation ($\vec\omega^{A/N}=0$): ${}^{N}\vec v_P = {}^{N}\vec v_{O'} + {}^{A}\vec v_P$
+    \item $P$ fixed in $A$ (${}^{A}\vec v_P = 0$, rigid-body point): ${}^{N}\vec v_P = {}^{N}\vec v_{O'} + \vec\omega^{A/N}\times\vec r_{P/O'}$
+    \item Common origin ($O'=O$, ${}^{N}\vec v_{O'}=0$): reduces to the transport theorem applied to $\vec r_{P/O}$
+\end{itemize}
+
+% ====================================================
+% TRANSLATING & ROTATING FRAMES --- ACCELERATION
+% ====================================================
+\section*{Acceleration: Translating \& Rotating Frames}
+Differentiating the velocity relation again (the ``five-term'' / Coriolis theorem):
+\begin{keybox}
+\begin{align*}
+    {}^{N}\vec a_P ={}& {}^{N}\vec a_{O'} + {}^{A}\vec a_P
+    + \vec\alpha^{A/N}\times\vec r_{P/O'} \\
+    &+ \vec\omega^{A/N}\times\big(\vec\omega^{A/N}\times\vec r_{P/O'}\big)
+    + 2\,\vec\omega^{A/N}\times {}^{A}\vec v_P
+\end{align*}
+\end{keybox}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item ${}^{N}\vec a_{O'}$ --- translational acceleration of the moving origin
+    \item ${}^{A}\vec a_P = \rate{A}{{}^{A}\vec v_P}$ --- acceleration of $P$ relative to $A$
+    \item $\vec\alpha^{A/N}\times\vec r_{P/O'}$ --- Euler (angular acceleration) term
+    \item $\vec\omega^{A/N}\times(\vec\omega^{A/N}\times\vec r_{P/O'})$ --- centripetal term
+    \item $2\,\vec\omega^{A/N}\times {}^{A}\vec v_P$ --- Coriolis term
+\end{itemize}
+\textbf{Special cases}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item Pure translation ($\vec\omega^{A/N}=0$): ${}^{N}\vec a_P = {}^{N}\vec a_{O'} + {}^{A}\vec a_P$
+    \item $P$ fixed in $A$ (${}^{A}\vec v_P={}^{A}\vec a_P=0$, rigid-body point):
+    \[
+        {}^{N}\vec a_P = {}^{N}\vec a_{O'} + \vec\alpha^{A/N}\times\vec r_{P/O'} + \vec\omega^{A/N}\times(\vec\omega^{A/N}\times\vec r_{P/O'})
+    \]
+    \item $P$ moving in $A$ but $O'$ fixed in $N$ (common origin, no translation): drop the ${}^{N}\vec a_{O'}$ term --- this is the form used for rotating-basis problems (e.g.\ spherical pendulum, rotating tube)
+\end{itemize}
+
+% ====================================================
+% NEWTON'S LAWS
+% ====================================================
+\section*{Newton's Laws of Motion}
+\begin{keybox}
+\[
+    \textbf{1st:}\ \textstyle\sum\vec F=0 \Rightarrow {}^{N}\ddot{\vec r}=\text{const}
+    \qquad
+    \textbf{2nd:}\ \textstyle\sum\vec F = m\,{}^{N}\ddot{\vec r}
+\]
+\end{keybox}
+\[
+    \textbf{3rd:}\ \ \vec F_{12} = -\vec F_{21}\quad\text{(action--reaction pairs)}
+\]
+Newton's 2nd law \textbf{requires} the acceleration relative to an inertial (Newtonian) frame $N$ --- never a rotating/accelerating frame directly.
+
+% ====================================================
+% WORK & ENERGY
+% ====================================================
+\section*{Work \& Energy}
+\subsection*{Kinetic \& potential energy}
+\[
+    T=\tfrac12 m|\dot{\vec r}|^{2}=\tfrac12 m\,\dot{\vec r}\cdot\dot{\vec r},
+    \qquad
+    V=V(\vec r)
+\]
+\[
+    \vec F=-\nabla V(\vec r)\quad\text{(conservative/``potential'' force)}
+\]
+\textbf{Common potentials}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item Uniform gravity: $V=mgh$, $\vec F=-mg\,\hat n_3$
+    \item Newtonian gravity: $V=-\dfrac{GmM}{r}$, $\vec F=\dfrac{GmM}{r^{2}}\hat b_1$ ($\hat b_1$: unit vector toward the attracting mass)
+    \item Linear spring (stretch $x$): $V=\tfrac12 kx^{2}$, $\vec F=-kx\,\hat n_1$
+\end{itemize}
+\subsection*{Work--energy theorem}
+\[
+    W=\int_{\vec r_1}^{\vec r_2}\vec F\cdot d\vec r, \qquad T_2-T_1=W
+\]
+\begin{keybox}
+All forces conservative ($\vec F=-\nabla V$):
+\[
+    T_1+V_1=T_2+V_2 \quad(\text{energy conserved})
+\]
+\end{keybox}
+Only holds when \emph{every} force doing work is conservative --- friction or other non-conservative applied forces break it.
+
+% ====================================================
+% MOMENTUM
+% ====================================================
+\section*{Momentum}
+\subsection*{Linear momentum}
+\[
+    \vec P=m\dot{\vec r}, \qquad \dot{\vec P}=m\ddot{\vec r}=\textstyle\sum\vec F
+\]
+If $\sum\vec F=\vec 0$, $\vec P$ is conserved.
+\subsection*{Angular momentum (about inertial fixed point $O$)}
+\begin{keybox}
+\[
+    \vec H_O=\vec r\times\vec P, \qquad \dot{\vec H}_O=\vec r\times\textstyle\sum\vec F=\textstyle\sum\vec M_O
+\]
+\end{keybox}
+``Rotational Newton's 2nd law.'' If $\sum\vec M_O=\vec 0$, $\vec H_O$ is conserved.
+
+% ====================================================
+% GENERALIZED COORDINATES
+% ====================================================
+\section*{Generalized Coordinates}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item \textbf{Generalized coordinates} $q_1,\dots,q_N$: minimal (or redundant) geometric variables (angles/distances) describing the configuration of a system
+    \item \textbf{Configuration space:} the set of all configurations the system can take on, parametrized by the $q_j$
+    \item A system may be described by a \textbf{redundant set} (more coordinates than DOF, related by constraint equations) or a \textbf{minimal set} (one coordinate per DOF, no constraints left)
+\end{itemize}
+\begin{keybox}
+\[
+    n_{\text{DOF}} = \#(\text{gen.\ coords}) - \#(\text{indep.\ constraints})
+\]
+\end{keybox}
+Always reduce to the minimal set before deriving equations of motion.
+
+% ====================================================
+% HOLONOMIC CONSTRAINTS
+% ====================================================
+\section*{Holonomic Constraints}
+\textbf{Position-based}: with $N$ generalized coordinates and $M$ constraints ($j=1,\dots,M$):
+\begin{keybox}
+\[
+    \phi_j(q_1,\dots,q_N)=\phi_j(\vec q)=0, \quad\text{or, if time-dependent,}\quad \phi_j(\vec q,t)=0
+\]
+\end{keybox}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item \textbf{Scleronomic:} no explicit $t$ --- time-independent constraint
+    \item \textbf{Rheonomic:} explicit $t$ dependence --- e.g.\ a prescribed moving support
+    \item Each independent holonomic constraint removes exactly one DOF (box above)
+    \item \textbf{Always rewritable as non-holonomic:} since $\phi_j\equiv0\Rightarrow\dot\phi_j\equiv0$,
+    \[
+        \dot\phi_j(\vec q,t)=\sum_{i=1}^{N}\frac{\partial\phi_j}{\partial q_i}\dot q_i+\frac{\partial\phi_j}{\partial t}=0
+        \qquad\big(a_{ji}\equiv\partial\phi_j/\partial q_i\big)
+    \]
+\end{itemize}
+
+% ====================================================
+% NON-HOLONOMIC CONSTRAINTS
+% ====================================================
+\section*{Non-Holonomic Constraints}
+\textbf{Velocity-based}: $\phi_j(\vec q,\dot{\vec q},t)=0$, usually taken \emph{linear} in the velocities (Pfaffian form):
+\begin{keybox}
+\[
+    \phi_j=\sum_{i=1}^{N}a_{ji}(\vec q,t)\,\dot q_i+a_{jt}(\vec q,t)=0
+\]
+\end{keybox}
+(no explicit $t$: $\ \phi_j=\sum_i a_{ji}(\vec q)\dot q_i=0$)
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item Every holonomic constraint can be written this way (box above); the \textbf{converse is false} --- a Pfaffian constraint is genuinely non-holonomic unless it is exact/integrable (or made exact with an integrating factor; check via the Frobenius condition)
+    \item Non-holonomic constraints reduce the number of independent \emph{velocities} but \textbf{not} the dimension of the configuration space
+    \item \textbf{Example --- knife-edge/skate/wheel constraint:} contact-point velocity must be perpendicular to the blade, $\vec v_A\cdot\hat n=0$ with $\hat n=(-\sin\theta,\cos\theta)$:
+    \[
+        \phi=-\sin\theta\,\dot x+\cos\theta\,\dot y=0
+    \]
+    With $(q_1,q_2,q_3)=(x,y,\theta)$: $a_1=-\sin q_3,\ a_2=\cos q_3,\ a_3=0$. Cannot be integrated to $\phi(\vec q)=0$ --- genuinely non-holonomic.
+\end{itemize}
+
+% ====================================================
+% D'ALEMBERT'S PRINCIPLE
+% ====================================================
+\section*{D'Alembert's Principle}
+\subsection*{Partial velocities}
+For particle $i$ with position $\vec r_i(\vec q,t)$, the partial velocity w.r.t.\ generalized speed $\dot q_j$:
+\[
+    \vec\gamma_{ij}=\frac{\partial\vec r_i}{\partial q_j}=\frac{\partial\dot{\vec r}_i}{\partial\dot q_j}
+\]
+(equal because $\dot{\vec r}_i$ is linear in the $\dot q_j$'s --- fastest computed by differentiating the already-known $\dot{\vec r}_i$ directly w.r.t.\ $\dot q_j$.)
+
+\subsection*{Equations of motion}
+For a minimal set $q_1,\dots,q_M$ and particles $i=1,\dots,n$:
+\begin{keybox}
+\[
+    \sum_{i=1}^{n}\big(\vec F_{Ai}-m_i\ddot{\vec r}_i\big)\cdot\vec\gamma_{ij}=0, \qquad j=1,\dots,M
+\]
+\end{keybox}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item $\vec F_{Ai}$ --- \emph{applied} (impressed) forces on particle $i$ only (gravity, springs, motors, \dots)
+    \item \textbf{Ideal constraint forces are excluded} (rod tension, normal forces, frictionless-contact forces) --- they do no virtual work consistent with the constraints and drop out automatically
+    \item One scalar equation per generalized coordinate --- exactly $M$ equations for $M$ DOF
+    \item Equivalently, with generalized force $Q_j=\sum_i\vec F_{Ai}\cdot\vec\gamma_{ij}$: $\ \sum_i m_i\ddot{\vec r}_i\cdot\vec\gamma_{ij}=Q_j$
+\end{itemize}
+
+\subsection*{Recipe}
+\begin{enumerate}[nosep, leftmargin=1.3em]
+    \item Choose a minimal set $q_1,\dots,q_M$ consistent with all holonomic constraints
+    \item Write $\vec r_i(\vec q,t)$ for every particle; differentiate for $\dot{\vec r}_i,\ddot{\vec r}_i$
+    \item Compute $\vec\gamma_{ij}=\partial\dot{\vec r}_i/\partial\dot q_j$ for every particle/coordinate pair
+    \item Identify applied forces $\vec F_{Ai}$ on each particle (\emph{exclude} constraint forces)
+    \item For each $j$: $\sum_i(\vec F_{Ai}-m_i\ddot{\vec r}_i)\cdot\vec\gamma_{ij}=0$ $\Rightarrow$ $M$ equations of motion
+    \item For linear (spring/mass) systems, these assemble into $[M]\ddot{\vec q}+[K]\vec q=\vec F$
+\end{enumerate}
+
+\end{multicols}
+\end{document}
