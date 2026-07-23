@@ -83,8 +83,20 @@
 \newcommand{\CodeListing}[3]{%
 \IfFileExists{#1}%
     {\lstinputlisting[style=pystyle,caption={#2},label={#3}]{#1}}%
-    {\begin{quote}\itshape Source file \texttt{#1} not found yet --- this
+    {\begin{quote}\itshape Source file \texttt{\detokenize{#1}} not found yet --- this
         listing will populate automatically once the file is written.\end{quote}}}
+
+% Figure listing: sources a generated plot directly, once it exists.
+\newcommand{\FigureListing}[4]{%
+\IfFileExists{#1}%
+    {\begin{figure}[H]
+        \centering
+        \includegraphics[width=#2]{#1}
+        \caption{#3}
+        \label{#4}
+    \end{figure}}%
+    {\begin{quote}\itshape Figure \texttt{\detokenize{#1}} not found yet --- this
+        figure will populate automatically once the corresponding script has been run.\end{quote}}}
 
 \begin{document}
 
@@ -98,7 +110,6 @@
     \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 1.png}
 \end{figure}
 
-
 % ====================================================
 % PROBLEM 2
 % ====================================================
@@ -110,9 +121,8 @@
     \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 2.png}
 \end{figure}
 
-
 % ====================================================
-% PROBLEM 4
+% PROBLEM 3
 % ====================================================
 \newpage
 \section*{Problem 3}
@@ -122,6 +132,18 @@
     \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 3.png}
 \end{figure}
 
+% ====================================================
+% PROBLEM 4
+% ====================================================
+\newpage
+\section*{Problem 4}
+
+\IfFileExists{Figures/Problem Set/Problem 4.png}%
+    {\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 4.png}
+    \end{figure}}%
+    {\begin{quote}\itshape Figure \texttt{Figures/Problem Set/Problem 4.png} not found yet --- paste in the problem statement image once available.\end{quote}}
 
 % ====================================================
 % APPENDIX
@@ -131,6 +153,6 @@
 \section*{Appendix: Code Listings}
 
 \subsection*{Problem 1 Code}
-\CodeListing{../code/Problem1.py}{INSERT .}{lst:p3}
+\CodeListing{../code/Problem1.py}{TODO: caption once Problem 1's solution/code is written.}{lst:p1}
 
 \end{document}
