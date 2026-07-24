@@ -83,7 +83,7 @@
 \newcommand{\CodeListing}[3]{%
 \IfFileExists{#1}%
     {\lstinputlisting[style=pystyle,caption={#2},label={#3}]{#1}}%
-    {\begin{quote}\itshape Source file \texttt{\detokenize{#1}} not found yet --- this
+    {\begin{quote}\itshape Source file \texttt{\detokenize{#1}} not found yet; this
         listing will populate automatically once the file is written.\end{quote}}}
 
 % Figure listing: sources a generated plot directly, once it exists.
@@ -95,7 +95,7 @@
         \caption{#3}
         \label{#4}
     \end{figure}}%
-    {\begin{quote}\itshape Figure \texttt{\detokenize{#1}} not found yet --- this
+    {\begin{quote}\itshape Figure \texttt{\detokenize{#1}} not found yet; this
         figure will populate automatically once the corresponding script has been run.\end{quote}}}
 
 \begin{document}
@@ -153,7 +153,7 @@ With $\vec q=[x,\theta]^T$, group the equations above as $M(\vec q)\ddot{\vec q}
     K(\vec q,t) = \begin{bmatrix} -F(t) \\ mgl\sin\theta \end{bmatrix}
 \]
 \end{result}
-As expected, $M(\vec q)$ is symmetric, positive-definite, and depends only on $\theta$.
+$M(\vec q)$ is symmetric, positive-definite, and depends only on $\theta$.
 
 \subsection*{Part (c): Normal Modes and Natural Frequencies}
 
@@ -212,27 +212,27 @@ Applying $\dfrac{d}{dt}\dfrac{\partial L}{\partial\dot\theta_i}-\dfrac{\partial 
 \begin{align*}
     \big[(m_1{+}m_2)l_1^2 &+ m_2l_2^2 + 2m_2l_1l_2\cos\theta_2\big]\ddot\theta_1
     + \big[m_2l_2^2+m_2l_1l_2\cos\theta_2\big]\ddot\theta_2 \\
-    &- m_2l_1l_2\sin\theta_2\,\dot\theta_2(2\dot\theta_1+\dot\theta_2)
+    &- m_2l_1l_2\sin\theta_2\,(2\dot\theta_1\dot\theta_2+\dot\theta_2^2)
     + (m_1{+}m_2)gl_1\sin\theta_1 + m_2gl_2\sin(\theta_1{+}\theta_2) = 0
     \\[6pt]
     l_2(\ddot\theta_1+\ddot\theta_2) &+ l_1\cos\theta_2\,\ddot\theta_1 + l_1\sin\theta_2\,\dot\theta_1^2 + g\sin(\theta_1+\theta_2) = 0
 \end{align*}
 \end{result}
-These two equations are coupled through $\theta_2$-dependent inertia terms and cannot be solved for $\ddot\theta_1,\ddot\theta_2$ independently --- they must be inverted as a $2\times2$ linear system at each instant.
+The two equations are coupled through the $\theta_2$-dependent inertia terms, so $\ddot\theta_1$ and $\ddot\theta_2$ cannot be isolated separately. The $2\times2$ system is inverted for them at each step.
 
 \subsection*{Part (b): Numerical Integration}
 
 Using $m_1=m_2=1\ \si{kg}$, $l_1=l_2=1\ \si{m}$, $g=9.81\ \si{m/s^2}$, and initial conditions $\theta_1(0)=1.0$, $\theta_2(0)=0.5$, $\dot\theta_1(0)=\dot\theta_2(0)=0$, the system above is inverted for $\ddot\theta_1,\ddot\theta_2$ and integrated forward in time.
 
-\FigureListing{Figures/Graphs/Problem2_theta_vs_time.png}{0.85\linewidth}{$\theta_1$ and $\theta_2$ vs.\ time for the base initial condition, integrated over $30\ \si{s}$ ($\gtrsim$10 small-angle periods).}{fig:p2_base}
+\FigureListing{Figures/Graphs/partb.png}{0.85\linewidth}{$\theta_1$ and $\theta_2$ vs.\ time for the base initial condition, integrated over $30\ \si{s}$ ($\gtrsim$10 small-angle periods).}{fig:p2_base}
 
 \subsection*{Part (c): Sensitivity to Initial Conditions}
 
 Repeating the integration with $\theta_1(0) = 1.0\pm0.1$ (holding $\theta_2(0),\dot\theta_1(0),\dot\theta_2(0)$ fixed):
 
-\FigureListing{Figures/Graphs/Problem2_sensitivity.png}{0.85\linewidth}{$\theta_1,\theta_2$ vs.\ time for $\theta_1(0)\in\{0.9,1.0,1.1\}$.}{fig:p2_sensitivity}
+\FigureListing{Figures/Graphs/partc.png}{0.85\linewidth}{$\theta_1,\theta_2$ vs.\ time for $\theta_1(0)\in\{0.9,1.0,1.1\}$.}{fig:p2_sensitivity}
 
-The three trajectories track each other closely at first, but diverge exponentially after a few oscillations until they are completely uncorrelated --- the hallmark of chaotic, sensitive dependence on initial conditions in the double pendulum. A $0.1\ \si{rad}$ ($\approx\!6^\circ$) change in $\theta_1(0)$ is enough to make the long-time motion unpredictable, even though the equations of motion are fully deterministic.
+The three trajectories stay close at first, then diverge exponentially after a few oscillations until they are uncorrelated. This is the sensitive dependence on initial conditions expected of the double pendulum: a $0.1\ \si{rad}$ ($\approx\!6^\circ$) change in $\theta_1(0)$ makes the long-time motion unpredictable even though the equations are deterministic.
 
 % ====================================================
 % PROBLEM 3
@@ -258,7 +258,7 @@ Let $\hat n_3$ point vertically upward with gravity $-g\hat n_3$, $\phi$ the ang
     L = \tfrac12 ml^2\big(\dot\phi^2+\sin^2\phi\,\dot\theta^2\big) + mgl\cos\phi
 \]
 \end{result}
-Notice $L$ depends on $\phi,\dot\phi,\dot\theta$ but not on $\theta$ itself --- $\theta$ is ignorable.
+$L$ depends on $\phi,\dot\phi,\dot\theta$ but not on $\theta$, so $\theta$ is ignorable.
 
 \subsection*{Part (a): Equations of Motion}
 
@@ -314,7 +314,7 @@ Applying Routh's equation $\dfrac{d}{dt}\Big(\dfrac{\partial R}{\partial\dot\phi
     \ddot\phi = \frac{B_\theta^2\cos\phi}{m^2l^4\sin^3\phi} - \frac{g}{l}\sin\phi
 \]
 \end{result}
-which matches Part (a) directly upon substituting $\dot\theta=f(\phi,B_\theta)$ into the $\phi$ equation there --- the Routhian reduces the problem to a single second-order ODE in $\phi$ alone, with $\theta(t)$ recovered afterward from Part (c).
+This matches Part (a) after substituting $\dot\theta=f(\phi,B_\theta)$ into the $\phi$ equation there. The Routhian reduces the problem to a single second-order ODE in $\phi$, with $\theta(t)$ recovered afterward from Part (c).
 
 % ====================================================
 % PROBLEM 4
@@ -389,9 +389,9 @@ together with $\dot x=u\cos\theta$, $\dot y=u\sin\theta$, $\dot\theta=\omega$. (
 
 \subsection*{Part (c): Numerical Integration}
 
-Using $m=1\ \si{kg}$, $I_c=0.5\ \si{kg\cdot m^2}$, $d=0.5\ \si{m}$, the reduced system $(u,\omega,x,y,\theta)$ is integrated forward in time with an IVP solver for a variety of initial $(u_0,\omega_0)$.
+Using $m=1\ \si{kg}$, $I_c=0.5\ \si{kg\cdot m^2}$, $d=0.5\ \si{m}$, the reduced system $(u,\omega,x,y,\theta)$ is integrated forward in time with an IVP solver for a variety of initial $(u_0,\omega_0)$. 
 
-\FigureListing{Figures/Graphs/Problem4_trajectory.png}{0.8\linewidth}{Skate path $(x(t),y(t))$ for several initial conditions.}{fig:p4_traj}
+\FigureListing{Figures/Graphs/fig2_xy_paths.png}{0.8\linewidth}{Skate path $(x(t),y(t))$ for several initial conditions.}{fig:p4_traj}
 
 \subsection*{Part (d): Body-Frame Velocity of the Center of Mass}
 
@@ -402,9 +402,9 @@ From the transport-theorem relation in Part (b), $\dot{\vec r}_C = u\hat b_1+d\o
 \]
 \end{result}
 
-\FigureListing{Figures/Graphs/Problem4_v1_v2.png}{0.8\linewidth}{$v_2$ vs.\ $v_1$ for several initial conditions.}{fig:p4_v1v2}
+\FigureListing{Figures/Graphs/fig1_phase_portrait.png}{0.8\linewidth}{$v_2$ vs.\ $v_1$ for several initial conditions.}{fig:p4_v1v2}
 
-Since $\dot u=d\omega^2\geq0$ and $\omega$ decays toward zero (its sign never flips, as $\dot\omega/\omega<0$ whenever $u>0$), every trajectory in the $v_1$--$v_2$ plane moves from its initial point monotonically toward the $v_1$-axis: the cart's rotation self-damps and it asymptotically settles into straight-line motion at constant speed, a classical stability result for the knife-edge sleigh.
+Since $\dot u=d\omega^2\geq0$ and $\omega$ decays toward zero (its sign never flips, since $\dot\omega/\omega<0$ whenever $u>0$), every trajectory in the $v_1$--$v_2$ plane moves monotonically toward the $v_1$-axis. The rotation self-damps and the sleigh settles into straight-line motion at constant speed, which is the standard stability result for the knife-edge sleigh.
 
 % ====================================================
 % APPENDIX
