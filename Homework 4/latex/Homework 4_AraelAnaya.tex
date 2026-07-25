@@ -110,6 +110,64 @@
     \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 1.png}
 \end{figure}
 
+\subsection*{Setup}
+
+Let $\hat n_1$ point down the incline (rolling direction) and $\hat n_2$ be the outward normal to the incline surface. Rolling without slipping ties the center $O$'s translation to $\theta$:
+\[
+    \vec r_O = r\theta\,\hat n_1 + r\,\hat n_2
+\]
+The embedded mass, rotating rigidly with the disk at radius $r/2$, is at
+\[
+    \vec r_m = \vec r_O + \frac r2\sin\theta\,\hat n_1 + \frac r2\cos\theta\,\hat n_2
+    = \left(r\theta+\frac r2\sin\theta\right)\hat n_1 + \left(r+\frac r2\cos\theta\right)\hat n_2
+\]
+
+\subsection*{Kinetic and Potential Energy}
+
+\[
+    \dot{\vec r}_m = \left(r\dot\theta+\frac r2\dot\theta\cos\theta\right)\hat n_1 - \frac r2\dot\theta\sin\theta\,\hat n_2
+\]
+\[
+    |\dot{\vec r}_m|^2 = r^2\dot\theta^2\left(1+\frac12\cos\theta\right)^2 + \frac{r^2}{4}\dot\theta^2\sin^2\theta = r^2\dot\theta^2\left(\frac54+\cos\theta\right)
+\]
+\begin{result}
+\[
+    T = \frac12 I(\theta)\dot\theta^2, \qquad I(\theta) \equiv mr^2\left(\frac54+\cos\theta\right)
+\]
+\end{result}
+With $\vec g = g\sin\alpha\,\hat n_1 - g\cos\alpha\,\hat n_2$ and $V=-m\vec g\cdot\vec r_m$:
+\begin{result}
+\[
+    V(\theta) = mgr\left[\cos\alpha\left(1+\frac12\cos\theta\right) - \sin\alpha\left(\theta+\frac12\sin\theta\right)\right]
+\]
+\end{result}
+
+\subsection*{Lagrangian, Momentum, and Hamiltonian}
+
+\[
+    L = T - V = \frac12 I(\theta)\dot\theta^2 - V(\theta),
+    \qquad
+    p_\theta = \frac{\partial L}{\partial\dot\theta} = I(\theta)\dot\theta
+\]
+$L$ is time-independent and $T$ is homogeneous quadratic in $\dot\theta$, so $H=T+V$, with $\dot\theta = p_\theta/I(\theta)$:
+\begin{result}
+\[
+    H(\theta,p_\theta) = \frac{p_\theta^2}{2mr^2\left(\dfrac54+\cos\theta\right)} + mgr\left[\cos\alpha\left(1+\frac12\cos\theta\right) - \sin\alpha\left(\theta+\frac12\sin\theta\right)\right]
+\]
+\end{result}
+
+\subsection*{Hamilton's Equations of Motion}
+
+\[
+    \dot\theta = \frac{\partial H}{\partial p_\theta}, \qquad \dot p_\theta = -\frac{\partial H}{\partial\theta}
+\]
+\begin{result}
+\begin{align*}
+    \dot\theta &= \frac{p_\theta}{mr^2\left(\dfrac54+\cos\theta\right)} \\[6pt]
+    \dot p_\theta &= -\frac{p_\theta^2\sin\theta}{2mr^2\left(\dfrac54+\cos\theta\right)^{2}} + mgr\left[\sin\alpha\left(1+\frac12\cos\theta\right) + \frac12\cos\alpha\sin\theta\right]
+\end{align*}
+\end{result}
+
 % ====================================================
 % PROBLEM 2
 % ====================================================
@@ -120,6 +178,94 @@
     \centering
     \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 2.png}
 \end{figure}
+
+\subsection*{Part (a): Hamiltonian}
+
+With $q=x$, $m=1$, $\omega=\sqrt k$:
+\[
+    T = \frac12\dot x^2, \qquad V = \frac12 kx^2 = \frac12\omega^2x^2,
+    \qquad
+    p_x = \frac{\partial L}{\partial\dot x} = \dot x
+\]
+\begin{result}
+\[
+    H(x,p_x) = T+V = \frac12\left(p_x^2+\omega^2x^2\right)
+\]
+\end{result}
+
+\subsection*{Part (b): Generating Function}
+
+\[
+    F(q,Q) = \frac12\omega q^2\cot(2\pi Q)
+\]
+
+\subsection*{Part (c): $p(q,Q)$ and $P(q,Q)$}
+
+\[
+    p = \frac{\partial F}{\partial q} = \omega q\cot(2\pi Q),
+    \qquad
+    P = -\frac{\partial F}{\partial Q} = -\frac12\omega q^2\big(-2\pi\csc^2(2\pi Q)\big)
+\]
+\begin{result}
+\[
+    p(q,Q) = \omega q\cot(2\pi Q), \qquad P(q,Q) = \frac{\pi\omega q^2}{\sin^2(2\pi Q)}
+\]
+\end{result}
+
+\subsection*{Part (d): $p(Q,P)$}
+
+Solving $P(q,Q)$ for $q$:
+\begin{result}
+\[
+    q(Q,P) = \sqrt{\frac{P}{\pi\omega}}\sin(2\pi Q)
+\]
+\end{result}
+Substituting into $p=\omega q\cot(2\pi Q)$:
+\[
+    p = \omega\sqrt{\frac{P}{\pi\omega}}\sin(2\pi Q)\cdot\frac{\cos(2\pi Q)}{\sin(2\pi Q)}
+\]
+\begin{result}
+\[
+    p(Q,P) = \sqrt{\frac{\omega P}{\pi}}\cos(2\pi Q)
+\]
+\end{result}
+
+\subsection*{Part (e): $H'(Q,P)$}
+
+\[
+    p^2 = \frac{\omega P}{\pi}\cos^2(2\pi Q), \qquad \omega^2q^2 = \frac{\omega P}{\pi}\sin^2(2\pi Q)
+    \qquad\Longrightarrow\qquad
+    p^2+\omega^2q^2 = \frac{\omega P}{\pi}
+\]
+\begin{result}
+\[
+    H'(Q,P) = \frac12\big(p^2+\omega^2q^2\big) = \frac{\omega P}{2\pi}
+\]
+\end{result}
+
+\subsection*{Part (f): Equations of Motion of $Q,P$}
+
+\begin{result}
+\[
+    \dot Q = \frac{\partial H'}{\partial P} = \frac{\omega}{2\pi} = \text{const}, \qquad \dot P = -\frac{\partial H'}{\partial Q} = 0
+\]
+\end{result}
+$Q$ is cyclic in $H'$, so $P$ is conserved.
+
+\subsection*{Part (g): Integration and Recovery of $q(t),p(t)$}
+
+\[
+    P(t) = P_0, \qquad Q(t) = \frac{\omega}{2\pi}t + Q_0
+\]
+Substituting into $q(Q,P)$, $p(Q,P)$ (so that $2\pi Q(t) = \omega t + 2\pi Q_0$):
+\begin{result}
+\[
+    q(t) = \sqrt{\frac{P_0}{\pi\omega}}\sin\big(\omega t+2\pi Q_0\big),
+    \qquad
+    p(t) = \sqrt{\frac{\omega P_0}{\pi}}\cos\big(\omega t+2\pi Q_0\big)
+\]
+\end{result}
+which is exactly the SHO solution, with amplitude $\sqrt{P_0/(\pi\omega)}$ and phase $2\pi Q_0$ set by the conserved $P_0$ and constant of integration $Q_0$.
 
 % ====================================================
 % PROBLEM 3
@@ -132,5 +278,71 @@
     \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 3.png}
 \end{figure}
 
+\subsection*{Setup}
+
+Let $\theta$ (with $\dot\theta=\omega_0$) locate $O'$ on the hoop and $\phi$ the angle of the string from the radial direction $OO'$, so the string's absolute orientation is $\theta+\phi$:
+\[
+    x = r\cos\theta + l\cos(\theta+\phi), \qquad y = r\sin\theta + l\sin(\theta+\phi)
+\]
+Since the tabletop is horizontal, gravity acts perpendicular to the plane of motion and $V=0$.
+
+\subsection*{Kinetic Energy}
+
+With $\dot\theta=\omega_0$ constant,
+\[
+    \dot x = -r\omega_0\sin\theta - l(\omega_0+\dot\phi)\sin(\theta+\phi),
+    \qquad
+    \dot y = r\omega_0\cos\theta + l(\omega_0+\dot\phi)\cos(\theta+\phi)
+\]
+Using $\sin\theta\sin(\theta+\phi)+\cos\theta\cos(\theta+\phi)=\cos\phi$:
+\[
+    |\dot{\vec r}|^2 = \dot x^2+\dot y^2 = r^2\omega_0^2 + l^2(\omega_0+\dot\phi)^2 + 2rl\,\omega_0(\omega_0+\dot\phi)\cos\phi
+\]
+\begin{result}
+\[
+    T = L = \frac12 ml^2\dot\phi^2 + ml\,\omega_0(l+r\cos\phi)\,\dot\phi + \frac{m\omega_0^2}{2}\left(r^2+l^2+2rl\cos\phi\right), \qquad V=0
+\]
+\end{result}
+
+\subsection*{Momentum and Hamiltonian}
+
+\[
+    p_\phi = \frac{\partial L}{\partial\dot\phi} = ml^2\dot\phi + ml\,\omega_0(l+r\cos\phi)
+\]
+The transformation to $\phi$ is rheonomic ($O'$ moves with prescribed $\theta=\omega_0t$), so $T$ is not homogeneous quadratic in $\dot\phi$. Splitting $T=T_2+T_1+T_0$ by degree in $\dot\phi$,
+\[
+    T_2 = \frac12ml^2\dot\phi^2, \qquad T_1 = ml\,\omega_0(l+r\cos\phi)\dot\phi, \qquad T_0 = \frac{m\omega_0^2}{2}\left(r^2+l^2+2rl\cos\phi\right)
+\]
+the general result $H=p_\phi\dot\phi-L=T_2-T_0+V$ (with $V=0$) applies here, not $H=T+V$:
+\begin{result}
+\[
+    H(\phi,\dot\phi) = T_2-T_0 = \frac12 ml^2\dot\phi^2 - \frac{m\omega_0^2}{2}\left(r^2+l^2+2rl\cos\phi\right)
+\]
+\end{result}
+$L$ itself has no explicit $t$-dependence once $\theta(t)=\omega_0t$ is substituted, so $H$ is still conserved --- it is the Jacobi integral, not the total mechanical energy.
+Inverting the momentum relation for $\dot\phi = \big[p_\phi-ml\,\omega_0(l+r\cos\phi)\big]/(ml^2)$ and substituting:
+\begin{result}
+\[
+    H(\phi,p_\phi) = \frac{\big[p_\phi-ml\,\omega_0(l+r\cos\phi)\big]^2}{2ml^2} - \frac{m\omega_0^2}{2}\left(r^2+l^2+2rl\cos\phi\right)
+\]
+\end{result}
+
+\subsection*{Hamilton's Equations of Motion}
+
+\[
+    \dot\phi = \frac{\partial H}{\partial p_\phi}, \qquad \dot p_\phi = -\frac{\partial H}{\partial\phi}
+\]
+\begin{result}
+\[
+    \dot\phi = \frac{p_\phi-ml\,\omega_0(l+r\cos\phi)}{ml^2}, \qquad \dot p_\phi = -mrl\,\omega_0(\omega_0+\dot\phi)\sin\phi
+\]
+\end{result}
+Differentiating the momentum relation in time and equating to $\dot p_\phi$ above, the $\dot\phi\sin\phi$ terms cancel identically, collapsing the pair to a single second-order equation:
+\begin{result}
+\[
+    \ddot\phi = -\frac{r\omega_0^2}{l}\sin\phi
+\]
+\end{result}
+a simple-pendulum equation driven by the hoop's rotation rate in place of gravity, consistent with the horizontal tabletop ($V=0$).
 
 \end{document}
