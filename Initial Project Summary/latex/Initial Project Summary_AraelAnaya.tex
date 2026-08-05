@@ -1,0 +1,135 @@
+\documentclass[11pt]{article}
+
+% ====================================================
+% PACKAGES
+% ====================================================
+\usepackage[margin=1in, headheight=13.6pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{tcolorbox}
+\usepackage{amsmath, amssymb, mathtools}
+\usepackage{siunitx}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\usepackage{listings}
+\usepackage{indentfirst}
+\usepackage[justification=centering]{caption}
+
+% Python source style for \CodeListing
+\lstdefinestyle{pystyle}{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue!60!black}\bfseries,
+    stringstyle=\color{orange!70!black},
+    commentstyle=\color{gray!60!black}\itshape,
+    numbers=left,
+    numberstyle=\tiny\color{gray!70},
+    numbersep=8pt,
+    breaklines=true,
+    showstringspaces=false,
+    frame=single,
+    rulecolor=\color{gray!40},
+    tabsize=4,
+    columns=fullflexible,
+    captionpos=b,
+    literate={°}{{\textdegree}}1,
+}
+\lstset{style=pystyle}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\Assignment\ |\ \course}
+\rhead{\Name\ |\ \SubDate}
+\cfoot{Page \thepage\ of~\pageref{LastPage}}
+
+\hypersetup{
+    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
+\newcommand{\Name}{Arael Anaya}
+\newcommand{\Assignment}{Initial Project Summary}
+\newcommand{\course}{Advanced Dynamics}
+\newcommand{\SubDate}{7/20/26}
+
+% Boxed final-answer environment
+\newtcolorbox{result}{
+    colback=blue!3!white,
+    colframe=blue!40!black,
+    boxrule=0.6pt,
+    arc=2pt,
+    left=6pt, right=6pt, top=4pt, bottom=4pt
+}
+
+% Code listing: sources the .py file directly.
+\newcommand{\CodeListing}[3]{%
+\IfFileExists{#1}%
+    {\lstinputlisting[style=pystyle,caption={#2},label={#3}]{#1}}%
+    {\begin{quote}\itshape Source file \texttt{#1} not found yet --- this
+        listing will populate automatically once the file is written.\end{quote}}}
+
+\begin{document}
+
+% ====================================================
+% HEADER BLOCK (matches original submission)
+% ====================================================
+\begin{flushright}
+    \Name \\
+    \course \\
+    \SubDate
+\end{flushright}
+
+\vspace{0.5em}
+
+% ====================================================
+% PROJECT SUMMARY
+% ====================================================
+For my final project I plan to study the spring-loaded inverted pendulum
+(SLIP) model of a hopping/running robot, which is the base for essentially
+all legged robot models. Despite its initial simplicity (a point mass
+bouncing on a massless spring leg), the SLIP model captures the
+center-of-mass dynamics of running in both animals and machines shockingly
+well. That makes it a great subject for this project: it is simple enough to
+analyze carefully with the tools from this course, but rich enough to
+produce very interesting behavior. It also builds naturally from the
+elastic pendulum system we have analyzed in this classroom, since the
+stance phase is essentially an inverted spring pendulum.
+
+What makes the SLIP model especially interesting from a mechanics
+standpoint is that it is a hybrid dynamical system. During the stance phase
+the body behaves like a spring-loaded pendulum, while in the flight phase
+it is just a projectile. I will derive the equations of motion for each
+phase, using the Lagrangian formulation in polar coordinates for the stance
+phase, and work out the switching conditions at touchdown and liftoff that
+connect the two phases.
+
+Rather than just analyzing the stability at a single equilibrium point, I
+will study the stability of the hopping gait itself. From quick research,
+the natural tool for this is an apex return map (a Poincar\'e map in which
+a periodic gait appears as a fixed point whose stability can be evaluated
+numerically). I will implement this model in Python, using event-based
+numerical integration, and run a parameter study on quantities like spring
+stiffness and touchdown angle to map out which combinations produce stable
+hopping. There is substantive literature on SLIP dynamics, so there is
+plenty to draw from for the paper and video presentation.
+
+\end{document}

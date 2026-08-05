@@ -101,7 +101,7 @@
 \thispagestyle{fancy}
 \begin{center}
     {\Large\bfseries Advanced Dynamics --- Equation Sheet}\\[1pt]
-    {\small Kinematics \(\cdot\) Newton's Laws \(\cdot\) Energy \& Momentum \(\cdot\) Generalized Coordinates \& Constraints \(\cdot\) D'Alembert's Principle}
+    {\small Kinematics \(\cdot\) Newton's Laws \(\cdot\) Energy \& Momentum \(\cdot\) Generalized Coordinates \& Constraints \(\cdot\) D'Alembert's Principle \(\cdot\) Lagrangian \& Hamiltonian Mechanics \(\cdot\) Nonlinear Dynamics \& Bifurcations \(\cdot\) Nondimensionalization}
 \end{center}
 \vspace{-8pt}
 
@@ -123,6 +123,8 @@
     \item $[R]^{B/A}$ --- rotation (direction cosine) matrix: $\{\hat b\} = [R]^{B/A}\{\hat a\}$
     \item $q_1,\dots,q_N$ --- generalized coordinates; $\vec\gamma_{ij}=\partial\vec r_i/\partial q_j$ --- partial velocities
     \item $\vec P = m\vec v$ --- linear momentum; $\vec H_O=\vec r\times\vec P$ --- angular momentum about $O$
+    \item $L=T-V$ --- Lagrangian; $p_j=\partial L/\partial\dot q_j$ --- conjugate (generalized) momentum
+    \item $H=\sum_jp_j\dot q_j-L$ --- Hamiltonian; $\lambda_k$ --- Lagrange multiplier for constraint $\phi_k$
 \end{itemize}
 
 % ====================================================
@@ -404,6 +406,211 @@ For a minimal set $q_1,\dots,q_M$ and particles $i=1,\dots,n$:
     \item For each $j$: $\sum_i(\vec F_{Ai}-m_i\ddot{\vec r}_i)\cdot\vec\gamma_{ij}=0$ $\Rightarrow$ $M$ equations of motion
     \item For linear (spring/mass) systems, these assemble into $[M]\ddot{\vec q}+[K]\vec q=\vec F$
 \end{enumerate}
+
+% ====================================================
+% LAGRANGIAN MECHANICS
+% ====================================================
+\section*{Lagrangian Mechanics}
+\subsection*{Euler--Lagrange equations}
+For a minimal set $q_1,\dots,q_M$; equivalent to D'Alembert's principle above (substitute $\vec\gamma_{ij}=\partial\dot{\vec r}_i/\partial\dot q_j$ into $L=T-V$ and simplify):
+\begin{keybox}
+\[
+    \frac{d}{dt}\left(\frac{\partial L}{\partial\dot q_j}\right) - \frac{\partial L}{\partial q_j} = Q_j^{nc}, \qquad j=1,\dots,M
+\]
+\end{keybox}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item $Q_j^{nc}$ --- generalized force from any applied force \emph{not} already folded into $V$ (a prescribed drive $F(t)$, friction, \dots); $=0$ if every applied force is conservative
+    \item One 2nd-order ODE per DOF; ideal constraint forces are still automatically excluded, since $L(\vec q,\dot{\vec q},t)$ is built from the minimal coordinates
+    \item Cross terms quadratic in velocity (Coriolis-type, from $\partial T/\partial q_j$) fall out of $\tfrac{d}{dt}(\partial L/\partial\dot q_j)-\partial L/\partial q_j$ automatically --- no need to track them separately as in Newtonian/D'Alembert bookkeeping
+\end{itemize}
+
+\subsection*{Matrix form \& small oscillations}
+Multi-DOF equations of motion assemble into
+\[
+    M(\vec q)\ddot{\vec q} + \vec C(\vec q,\dot{\vec q}) + \vec K(\vec q,t) = \vec 0
+\]
+($M$: symmetric positive-definite mass/inertia matrix; $\vec C$: Coriolis/centripetal-type $\dot q^2$ terms; $\vec K$: stiffness/gravity/forcing terms). Linearizing about an equilibrium ($\sin(\cdot)\to(\cdot)$, $\cos(\cdot)\to1$, drop $\dot q^2$ terms):
+\begin{keybox}
+\[
+    M\ddot{\vec q} + K\vec q = \vec 0
+\]
+\end{keybox}
+Assume $\vec q=\vec Qe^{i\omega t}$: non-trivial solutions require the \textbf{characteristic equation}
+\[
+    \det\!\big(K-\omega^{2}M\big)=0 \quad\Rightarrow\quad \text{natural frequencies }\omega_i
+\]
+Mode shape $\vec Q_i$ (up to overall scale) solves $(K-\omega_i^2M)\vec Q_i=\vec 0$; lowest $\omega_i$ = coordinates in phase, higher $\omega_i$ = out of phase.
+
+\subsection*{Ignorable (cyclic) coordinates \& Routhian reduction}
+If $L$ has no explicit $q_k$-dependence ($\partial L/\partial q_k=0$; only $\dot q_k$ appears), Lagrange's equation for it collapses to a conservation law:
+\begin{keybox}
+\[
+    \frac{\partial L}{\partial\dot q_k} = B_k = \text{const} \qquad\text{(conserved generalized momentum)}
+\]
+\end{keybox}
+Invert for $\dot q_k=f(\vec q_{\text{rest}},B_k)$ and use it to eliminate $\dot q_k$ from the remaining dynamics via the \textbf{Routhian}
+\[
+    R(\vec q_{\text{rest}},\dot{\vec q}_{\text{rest}};B_k) \equiv L - \dot q_k B_k\Big|_{\dot q_k\to f(\vec q_{\text{rest}},B_k)}
+\]
+\[
+    \frac{d}{dt}\frac{\partial R}{\partial\dot q_j}-\frac{\partial R}{\partial q_j}=0 \quad (j\neq k)
+\]
+This reduces the problem by one coordinate; recover $q_k(t)$ afterward by integrating $\dot q_k=f(\vec q_{\text{rest}}(t),B_k)$.
+
+\subsection*{Constraint forces via Lagrange multipliers}
+For $M$ coordinates with $m$ Pfaffian constraints $\phi_k=\sum_ia_{ki}\dot q_i+a_{kt}=0$ ($k=1,\dots,m$; a holonomic constraint left un-eliminated works the same way, with $a_{ki}=\partial\phi_k/\partial q_i$):
+\begin{keybox}
+\[
+    \frac{d}{dt}\frac{\partial L}{\partial\dot q_j}-\frac{\partial L}{\partial q_j} = \sum_{k=1}^{m}\lambda_k\,a_{kj}, \qquad j=1,\dots,M
+\]
+\end{keybox}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item $M$ equations of motion $+$ $m$ constraint equations $\phi_k=0$ close the system for $\vec q(t)$ \textbf{and} $\lambda_k(t)$
+    \item $\sum_k\lambda_k a_{kj}$ is exactly the constraint force conjugate to $q_j$ --- this is how the forces D'Alembert/plain Lagrange discard get recovered (e.g.\ rod tension, knife-edge normal force)
+    \item \textbf{Recipe:} write $L=T-V$; list $a_{ki}$ from each $\phi_k$; write the $M$ boxed equations plus the $m$ constraints $\phi_k=0$; solve algebraically for $\lambda_k$ (introducing a body-frame speed like $u\equiv\dot{\vec r}\cdot\hat b_1$ often decouples the algebra)
+\end{itemize}
+
+% ====================================================
+% HAMILTONIAN MECHANICS
+% ====================================================
+\section*{Hamiltonian Mechanics}
+\subsection*{Generalized momentum \& the Hamiltonian}
+\[
+    p_j \equiv \frac{\partial L}{\partial\dot q_j}
+\]
+\begin{keybox}
+\[
+    H(\vec q,\vec p,t) \equiv \sum_j p_j\dot q_j - L \qquad\text{(Legendre transform of }L\text{)}
+\]
+\end{keybox}
+Invert $p_j(\vec q,\dot{\vec q},t)$ for $\dot q_j(\vec q,\vec p,t)$ and substitute so $H$ is expressed purely in $(\vec q,\vec p,t)$.
+
+\subsection*{When does $H=T+V$?}
+Split $T$ by degree in the $\dot q_j$: $T=T_2+T_1+T_0$ ($T_2$ homogeneous quadratic, $T_1$ linear, $T_0$ velocity-independent --- all can depend on $\vec q,t$). In general
+\begin{keybox}
+\[
+    H = T_2-T_0+V \qquad\text{(the \emph{Jacobi integral})}
+\]
+\end{keybox}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item Reduces to $H=T+V$ \textbf{only} when $T_1=T_0=0$: $\vec r_i(\vec q)$ has no explicit $t$-dependence (scleronomic transformation) so $T=T_2$ is homogeneous quadratic in $\dot{\vec q}$
+    \item Rheonomic transformations (a prescribed $\theta(t)=\omega_0t$, a moving support, \dots) generally give $T_1,T_0\neq0$, so $H\neq T+V$ even when $H$ is conserved
+    \item $H$ is conserved whenever $\partial L/\partial t=0$ (no explicit $t$ left \emph{after} substituting any prescribed motion), regardless of whether $H=T+V$
+\end{itemize}
+
+\subsection*{Hamilton's canonical equations}
+\begin{keybox}
+\[
+    \dot q_j = \frac{\partial H}{\partial p_j}, \qquad \dot p_j = -\frac{\partial H}{\partial q_j}
+\]
+\end{keybox}
+$2M$ first-order ODEs replace the $M$ second-order Euler--Lagrange equations --- the natural form for numerical IVP integration. If $q_k$ is cyclic ($\partial H/\partial q_k=0$): $\dot p_k=0\Rightarrow p_k=$ const (matches the Lagrangian/Routhian result, $p_k\equiv B_k$).
+
+\subsection*{Canonical transformations \& generating functions}
+$(\vec q,\vec p)\to(\vec Q,\vec P)$ is \textbf{canonical} if Hamilton's equations hold in the new variables for some $H'(\vec Q,\vec P,t)$. A \textbf{type-1 generating function} $F(\vec q,\vec Q,t)$ produces one via
+\begin{keybox}
+\[
+    p_j = \frac{\partial F}{\partial q_j}, \qquad P_j = -\frac{\partial F}{\partial Q_j}, \qquad H' = H+\frac{\partial F}{\partial t}
+\]
+\end{keybox}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item If $F$ has no explicit $t$: $H'(\vec Q,\vec P)$ is just $H$ re-expressed in the new variables
+    \item \textbf{Goal:} pick $F$ so $H'$ is simple (e.g.\ every $Q_j$ cyclic) --- then $\dot P_j=0$ and $\dot Q_j=\partial H'/\partial P_j=$ const, trivially integrable
+    \item \textbf{Recipe:} (1) $p(q,Q)=\partial F/\partial q$; (2) $P(q,Q)=-\partial F/\partial Q$; (3) invert for $q(Q,P)$, then $p(Q,P)$; (4) substitute into $H(q,p)$ to get $H'(Q,P)$; (5) solve the (now trivial) EOM in $(Q,P)$; (6) transform back for $q(t),p(t)$
+\end{itemize}
+
+% ====================================================
+% 1-D DYNAMICAL SYSTEMS & BIFURCATIONS
+% ====================================================
+\section*{1-D Dynamical Systems \& Bifurcations}
+\subsection*{Fixed points \& linear stability}
+System $\dot x=f(x;r)$, $r$ a control (parameter).
+\begin{keybox}
+\[
+    \text{Fixed pts: } f(x^*;r)=0
+    \qquad
+    \text{Stability: } \dot\eta = f'(x^*)\,\eta,\ \ \eta\equiv x-x^*
+\]
+\end{keybox}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item $f'(x^*)<0$: stable/attracting \quad $f'(x^*)>0$: unstable/repelling
+    \item $f'(x^*)=0$: linearization inconclusive --- the \emph{marginal/degenerate} case where bifurcations live
+\end{itemize}
+
+\subsection*{Recipe: locate a bifurcation}
+\begin{enumerate}[nosep, leftmargin=1.3em]
+    \item Find all fixed points $x^*(r)$: solve $f(x;r)=0$
+    \item Compute $f_x(x;r)=\partial f/\partial x$ and evaluate along each branch $x^*(r)$
+    \item A bifurcation sits at $(x_c,r_c)$ where the branch is \emph{degenerate}:
+    \[
+        f(x_c;r_c)=0 \quad\text{and}\quad f_x(x_c;r_c)=0
+    \]
+    (solve these two equations simultaneously for $x_c,r_c$ --- this is exactly where two branches of $x^*(r)$ meet, or a branch's stability flips)
+    \item Classify using the recipe/table below (Taylor-expand $f$ about $(x_c,r_c)$ if it's not already in normal form)
+\end{enumerate}
+
+\subsection*{Fast decision path (given explicit $f(x,r)$)}
+\begin{enumerate}[nosep, leftmargin=1.3em]
+    \item Is $x=x_0$ a root of $f$ for \emph{every} $r$ (a ``trivial'' branch, often $x_0=0$)?\\
+    \textbf{No} $\to$ solve $f=0,\ f_x=0$ together for isolated $(x_c,r_c)$ $\to$ \textbf{saddle-node}.\\
+    \textbf{Yes} $\to$ continue.
+    \item Is $f(x,r)$ odd about $x_0$, i.e.\ $f(x_0-x,r)=-f(x_0+x,r)$?\\
+    \textbf{No} $\to$ \textbf{transcritical} at $r_c$ solving $f_x(x_0,r_c)=0$.\\
+    \textbf{Yes} $\to$ \textbf{pitchfork} at that $r_c$; Taylor/series-expand $f\approx (r-r_c)(x-x_0) + a\,(x-x_0)^3$ (expand any $\sinh$, $\tfrac{x}{1+x^2}$, etc.\ to cubic order) --- $a<0$ supercritical, $a>0$ subcritical.
+\end{enumerate}
+
+\subsection*{Classification (normal forms)}
+Let $\xi=x-x_c$, $\mu=r-r_c$.
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item \textbf{Saddle-node (fold):} $\dot\xi=\mu-\xi^2$ (or $\mu+\xi^2$) --- \emph{no} fixed point at $\xi=0$ for all $\mu$; two fixed points ($x^*\propto\pm\sqrt\mu$) collide and annihilate as $\mu$ crosses $0$, existing only on one side of $r_c$. Test: $f_r\neq0,\ f_{xx}\neq0$.
+    \item \textbf{Transcritical:} $\dot\xi=\mu\xi-\xi^2$ --- $\xi=0$ \emph{is} a fixed point for \emph{all} $\mu$ (trivial branch persists forever); a second branch $\xi=\mu$ crosses it at $\mu=0$ and the two \emph{exchange stability}; total \# of fixed points is unchanged across $r_c$. Test: $f_{x\mu}\neq0,\ f_{xx}\neq0$.
+    \item \textbf{Supercritical pitchfork:} $\dot\xi=\mu\xi-\xi^3$ --- symmetric ($f(-\xi)=-f(\xi)$); trivial branch $\xi=0$ stable for $\mu<0$, goes unstable at $\mu=0$ and sheds \emph{two new stable} branches $\xi=\pm\sqrt\mu$ for $\mu>0$. Cubic coefficient $<0$.
+    \item \textbf{Subcritical pitchfork:} $\dot\xi=\mu\xi+\xi^3$ --- same symmetry, but sheds \emph{two unstable} branches for $\mu<0$; trivial branch is unstable for $\mu>0$ with no nearby stable state (real systems jump/hysterese to a distant attractor via a higher-order saddle-node). Cubic coefficient $>0$.
+\end{itemize}
+
+\subsection*{Phase line (1-D phase portrait)}
+Plot $\dot x$ vs.\ $x$ for fixed $r$: mark equilibria where the curve crosses $\dot x=0$, arrows on the $x$-axis between crossings showing the sign of $\dot x$ (right if $f>0$, left if $f<0$).
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item Filled dot: stable ($f$ goes $+\to-$ through it, arrows point \emph{in}); open dot ($\circ$): unstable ($-\to+$, arrows point \emph{out})
+    \item Half-filled dot: semi-stable (same sign on both sides --- the signature of a saddle-node exactly at $r=r_c$)
+    \item Sweeping $r$ and stacking phase lines side-by-side (equilibria vs.\ $r$) reconstructs the bifurcation diagram; solid branch = stable, dashed = unstable
+\end{itemize}
+\emph{(2-D extension --- nullclines, Jacobian trace/det, Hopf bifurcation: TBD)}
+
+% ====================================================
+% NONDIMENSIONALIZATION
+% ====================================================
+\section*{Nondimensionalizing an Equation of Motion}
+\subsection*{Recipe}
+\begin{enumerate}[nosep, leftmargin=1.3em]
+    \item Write the dimensional EOM and list every dimensional quantity appearing in it (state variable(s), $t$, and all parameters: $m,k,b,g,\ell,\dots$)
+    \item Choose a characteristic \textbf{length} $L$ and \textbf{time} $T$ built from the problem's own parameters (e.g.\ $L=$ a natural length/amplitude in the geometry, $T=\sqrt{m/k}$ or $1/\omega_n$) --- these are what get scaled out
+    \item Define dimensionless variables $\xi=x/L$, $\tau=t/T$ (one pair per independent physical dimension in play; add a scaled force/energy if one appears)
+    \item Convert derivatives by chain rule: $\dot x=\dfrac{L}{T}\xi'$, $\ddot x=\dfrac{L}{T^{2}}\xi''$ (primes $=d/d\tau$)
+    \item Substitute into the EOM; divide the whole equation by the coefficient of the \emph{highest} derivative so it has unit leading coefficient
+    \item Collect every remaining combination of parameters into as few dimensionless groups as possible (Buckingham $\pi$: \#groups $=$ \#parameters $-$ \#independent dimensions); name each one ($\zeta,\epsilon,\dots$) --- these are the only ``knobs'' left in the problem
+    \item Sanity check: every leftover coefficient multiplying a $\xi,\xi',\xi''$ term must be a pure number (no residual kg/m/s)
+\end{enumerate}
+
+\subsection*{Worked template (spring--mass--damper type)}
+Dimensional: $m\ddot x+b\dot x+kx=F(t)$ (e.g.\ a gravity component or drive). With $T=\sqrt{m/k}$, $L=$ a natural length scale, $\tau=t/T$, $\xi=x/L$:
+\begin{keybox}
+\[
+    \xi''+2\zeta\,\xi'+\xi=\tilde F(\tau), \qquad
+    2\zeta\equiv\frac{b}{\sqrt{mk}}, \qquad
+    \tilde F\equiv\frac{F\,T^{2}}{mL}
+\]
+\end{keybox}
+$\zeta$ (damping ratio) is the one leftover dimensionless group here; a tilted/geometric system typically adds one more (an angle $\alpha$ --- already dimensionless --- or a length ratio $a/L$), matching ``3 dimensionless parameters'' style results.
+
+\subsection*{Overdamped/singular limit $\Rightarrow$ drops the order by one}
+If a derivative's dimensionless coefficient is formally small (heavy damping $\Rightarrow$ small effective inertia, or a genuinely small mass), write it as $\epsilon\,\xi''+\xi'+\dots=0$ with $\epsilon\ll1$ and set $\epsilon\to0$ (quasi-static/regular-perturbation assumption):
+\begin{keybox}
+\[
+    \epsilon\,\xi''+\xi' = g(\xi;\vec p) \ \ \xrightarrow{\ \epsilon\to0\ }\ \ \xi' = g(\xi;\vec p)
+\]
+\end{keybox}
+This collapses a 2nd-order (2-D phase-plane) system to a \textbf{1-D, 1st-order} system --- the phase-line/bifurcation analysis above applies directly, with the remaining dimensionless groups $\vec p$ playing the role of $r$.
 
 \end{multicols}
 \end{document}
