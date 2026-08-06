@@ -15,6 +15,7 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{subcaption}
+\usepackage{tikz}
 
 \usepackage{enumitem}
 \usepackage{booktabs}
@@ -101,7 +102,7 @@
 \thispagestyle{fancy}
 \begin{center}
     {\Large\bfseries Advanced Dynamics --- Equation Sheet}\\[1pt]
-    {\small Kinematics \(\cdot\) Newton's Laws \(\cdot\) Energy \& Momentum \(\cdot\) Generalized Coordinates \& Constraints \(\cdot\) D'Alembert's Principle \(\cdot\) Lagrangian \& Hamiltonian Mechanics \(\cdot\) Nonlinear Dynamics \& Bifurcations \(\cdot\) Nondimensionalization}
+    {\small Kinematics \(\cdot\) Newton's Laws \(\cdot\) Energy \& Momentum \(\cdot\) Generalized Coordinates \& Constraints \(\cdot\) D'Alembert's Principle \(\cdot\) Lagrangian \& Hamiltonian Mechanics \(\cdot\) Nonlinear Dynamics \& Bifurcations \(\cdot\) 2-D Linear Systems \(\cdot\) Nondimensionalization}
 \end{center}
 \vspace{-8pt}
 
@@ -575,7 +576,83 @@ Plot $\dot x$ vs.\ $x$ for fixed $r$: mark equilibria where the curve crosses $\
     \item Half-filled dot: semi-stable (same sign on both sides --- the signature of a saddle-node exactly at $r=r_c$)
     \item Sweeping $r$ and stacking phase lines side-by-side (equilibria vs.\ $r$) reconstructs the bifurcation diagram; solid branch = stable, dashed = unstable
 \end{itemize}
-\emph{(2-D extension --- nullclines, Jacobian trace/det, Hopf bifurcation: TBD)}
+2-D extension (nullclines, Hopf bifurcation) mirrors this, using the trace--determinant classification below to track how the fixed point's type changes with $r$.
+
+% ====================================================
+% 2-D LINEAR SYSTEMS & CLASSIFICATION
+% ====================================================
+\section*{2-D Linear Systems \& Classification}
+\subsection*{State-space form \& the Jacobian}
+Any $\ddot x = f(x,\dot x)$ becomes a 2-D first-order system with $v\equiv\dot x$: $\dot x=v,\ \dot v=f(x,v)$. More generally, for a pair of 1st-order ODEs $\dot q_1=f_1(q_1,q_2)$, $\dot q_2=f_2(q_1,q_2)$, linearizing about a fixed point $\vec q^*$ (where $f_1=f_2=0$) with $\vec\eta=\vec q-\vec q^*$ gives:
+\begin{keybox}
+\[
+    \dot{\vec\eta} = A\,\vec\eta, \qquad
+    A = \begin{bmatrix}
+        \partial f_1/\partial q_1 & \partial f_1/\partial q_2\\[2pt]
+        \partial f_2/\partial q_1 & \partial f_2/\partial q_2
+    \end{bmatrix}_{\vec q^*} \quad\text{(Jacobian)}
+\]
+\end{keybox}
+This is the direct 2-D analogue of $\dot\eta=f'(x^*)\eta$ from the 1-D case above --- same idea, now with a matrix.
+
+\subsection*{Eigenvalues, trace \& determinant}
+Try $\vec\eta=\vec v\,e^{\lambda t}$: non-trivial solutions require $\det(A-\lambda I)=0$, i.e.
+\begin{keybox}
+\[
+    \lambda^2-\tau\lambda+\Delta=0
+    \ \Rightarrow\
+    \lambda_{1,2}=\frac{\tau\pm\sqrt{\tau^2-4\Delta}}{2},
+    \qquad
+    \tau\equiv\operatorname{tr}A=\lambda_1+\lambda_2,\quad
+    \Delta\equiv\det A=\lambda_1\lambda_2
+\]
+\end{keybox}
+General solution (distinct $\lambda_i$): $\vec\eta(t)=c_1\vec v_1e^{\lambda_1t}+c_2\vec v_2e^{\lambda_2t}$. Stability depends only on $\operatorname{Re}(\lambda_{1,2})$ --- i.e.\ only on $(\Delta,\tau)$ --- so the fixed point can be classified \emph{without} solving for eigenvectors.
+
+\subsection*{Classification: the $(\Delta,\tau)$ plane}
+\begin{center}
+\begin{tikzpicture}[xscale=0.95, yscale=0.62, font=\tiny]
+    \def\Tmax{2.6}
+    \def\Dmax{1.69}
+    \def\Dneg{-1.5}
+    % --- shaded regions: upper half (tau>0) ---
+    \fill[blue!12] (0,0) -- plot[domain=0:\Tmax,smooth,variable=\t] ({(\t*\t)/4},{\t}) -- (\Dmax,0) -- cycle;
+    \fill[blue!28] (0,0) -- plot[domain=0:\Tmax,smooth,variable=\t] ({(\t*\t)/4},{\t}) -- (0,\Tmax) -- cycle;
+    % --- shaded regions: lower half (tau<0) ---
+    \fill[green!45!gray!18] (0,0) -- plot[domain=0:-\Tmax,smooth,variable=\t] ({(\t*\t)/4},{\t}) -- (\Dmax,0) -- cycle;
+    \fill[green!45!gray!35] (0,0) -- plot[domain=0:-\Tmax,smooth,variable=\t] ({(\t*\t)/4},{\t}) -- (0,-\Tmax) -- cycle;
+    % --- saddle region (Delta<0) ---
+    \fill[gray!30] (\Dneg,-\Tmax) rectangle (0,\Tmax);
+    % --- axes ---
+    \draw[->] (\Dneg,0) -- (\Dmax+0.35,0) node[right] {$\Delta$};
+    \draw[->] (0,-\Tmax-0.35) -- (0,\Tmax+0.35) node[above] {$\tau$};
+    % --- parabola boundary tau^2 = 4 Delta ---
+    \draw[thick] plot[domain=-\Tmax:\Tmax,smooth,variable=\t] ({(\t*\t)/4},{\t});
+    \node[align=left] at (\Dmax-0.05,\Tmax+0.35) {$\tau^2=4\Delta$};
+    % --- region labels ---
+    \node[align=center] at (\Dneg/2,1.1) {saddle\\points};
+    \node[align=center] at (0.32,2.05) {unstable\\nodes};
+    \node[align=center] at (1.05,1.35) {unstable\\spirals};
+    \node[align=center] at (1.05,-1.35) {stable\\spirals};
+    \node[align=center] at (0.32,-2.05) {stable\\nodes};
+    \node at (0.95,0.22) {centers};
+    \draw[->] (0.7,0.22) -- (0.1,0.05);
+    \node[align=center] at (-0.75,-2.25) {non-isolated\\fixed pts.};
+    \draw[->] (-0.2,-2.05) -- (-0.03,-1.5);
+    \node[align=center] at (1.45,-2.25) {stars, degen.\\nodes};
+    \draw[->] (1.3,-2.0) -- (1.05,-1.6);
+\end{tikzpicture}
+\end{center}
+\begin{itemize}[nosep, leftmargin=1.1em]
+    \item \textbf{$\Delta<0$ --- saddle:} real, opposite-sign eigenvalues ($\lambda_1\lambda_2=\Delta<0$) $\Rightarrow$ \emph{always unstable} (one stable + one unstable eigendirection), regardless of $\tau$
+    \item \textbf{$\Delta>0,\ \tau^2>4\Delta$ --- node:} real eigenvalues, same sign (sign of $\tau$, since $\Delta>0$). $\tau>0$: unstable node; $\tau<0$: stable node
+    \item \textbf{$\Delta>0,\ \tau^2<4\Delta$ --- spiral:} complex-conjugate pair $\lambda=\tfrac{\tau}{2}\pm i\omega$; real part $\tau/2$ sets the growth/decay of the oscillatory envelope. $\tau>0$: unstable spiral; $\tau<0$: stable spiral
+    \item \textbf{$\tau=0,\ \Delta>0$ --- center:} $\lambda=\pm i\sqrt\Delta$ purely imaginary $\Rightarrow$ neutrally stable closed orbits \emph{for the linear system only} --- nonlinear terms generically destroy a center (turn it into a weak spiral)
+    \item \textbf{$\tau^2=4\Delta$ (on the parabola), $\Delta>0$ --- repeated real $\lambda=\tau/2$:} \emph{star node} if $A\propto I$ (two independent eigenvectors, every direction is an eigendirection); \emph{degenerate node} otherwise (only one eigenvector; trajectories become tangent to it)
+    \item \textbf{$\Delta=0$ --- non-isolated fixed points:} at least one $\lambda=0$ $\Rightarrow$ a whole \emph{line} of fixed points, not just the origin. $\tau<0$ (other eigenvalue negative): line attracts; $\tau>0$: line repels
+\end{itemize}
+
+\textbf{Recipe:} (1) find fixed point(s) $\vec q^*$ solving $f_1=f_2=0$; (2) build the Jacobian $A$ there; (3) compute $\tau=\operatorname{tr}A$, $\Delta=\det A$; (4) locate $(\Delta,\tau)$ in the plane above to classify --- no need to solve for $\lambda$ just to determine type/stability; (5) only solve for $\lambda_{1,2}$ (and eigenvectors, if sketching the actual phase portrait/eigendirections) after classifying.
 
 % ====================================================
 % NONDIMENSIONALIZATION
