@@ -598,14 +598,13 @@ This is the direct 2-D analogue of $\dot\eta=f'(x^*)\eta$ from the 1-D case abov
 \subsection*{Eigenvalues, trace \& determinant}
 Try $\vec\eta=\vec v\,e^{\lambda t}$: non-trivial solutions require $\det(A-\lambda I)=0$, i.e.
 \begin{keybox}
-\[
+\begin{gather*}
     \lambda^2-\tau\lambda+\Delta=0
     \ \Rightarrow\
-    \lambda_{1,2}=\frac{\tau\pm\sqrt{\tau^2-4\Delta}}{2},
-    \qquad
-    \tau\equiv\operatorname{tr}A=\lambda_1+\lambda_2,\quad
+    \lambda_{1,2}=\frac{\tau\pm\sqrt{\tau^2-4\Delta}}{2} \\
+    \tau\equiv\operatorname{tr}A=\lambda_1+\lambda_2,\qquad
     \Delta\equiv\det A=\lambda_1\lambda_2
-\]
+\end{gather*}
 \end{keybox}
 General solution (distinct $\lambda_i$): $\vec\eta(t)=c_1\vec v_1e^{\lambda_1t}+c_2\vec v_2e^{\lambda_2t}$. Stability depends only on $\operatorname{Re}(\lambda_{1,2})$ --- i.e.\ only on $(\Delta,\tau)$ --- so the fixed point can be classified \emph{without} solving for eigenvectors.
 
@@ -653,6 +652,25 @@ General solution (distinct $\lambda_i$): $\vec\eta(t)=c_1\vec v_1e^{\lambda_1t}+
 \end{itemize}
 
 \textbf{Recipe:} (1) find fixed point(s) $\vec q^*$ solving $f_1=f_2=0$; (2) build the Jacobian $A$ there; (3) compute $\tau=\operatorname{tr}A$, $\Delta=\det A$; (4) locate $(\Delta,\tau)$ in the plane above to classify --- no need to solve for $\lambda$ just to determine type/stability; (5) only solve for $\lambda_{1,2}$ (and eigenvectors, if sketching the actual phase portrait/eigendirections) after classifying.
+
+\subsection*{Eigenvectors \& the Hartman--Grobman theorem}
+Saddle arrow directions: solve $(A-\lambda_iI)\vec v_i=\vec 0$ for each $\lambda_i$ --- the negative-$\lambda$ eigenvector is the incoming (stable) direction, the positive-$\lambda$ eigenvector the outgoing (unstable) direction; these are the only directions trajectories can approach/leave along and they organize the global separatrices.
+\begin{keybox}
+\textbf{Hartman--Grobman:} if every $\lambda_i$ has $\operatorname{Re}(\lambda_i)\neq0$ (a \emph{hyperbolic} fixed point), the nonlinear flow near $\vec q^*$ is topologically equivalent to the linearized flow $\dot{\vec\eta}=A\vec\eta$ --- linearized stability \emph{is} nonlinear stability.
+\end{keybox}
+The guarantee \textbf{fails} exactly when some $\operatorname{Re}(\lambda_i)=0$: a \textbf{center} ($\tau=0,\Delta>0$) is only guaranteed in the full nonlinear system if it has an exact conserved quantity (e.g.\ energy) --- otherwise nonlinear terms can turn it into a weak spiral; $\Delta=0$ (\textbf{non-hyperbolic}, a zero eigenvalue) also voids the theorem and typically signals a line/continuum of fixed points.
+
+\subsection*{Full pipeline: classify \& sketch a nonlinear phase portrait}
+\begin{enumerate}[nosep, leftmargin=1.3em]
+    \item \textbf{State space:} for $\ddot x=f(x,\dot x)$ set $v\equiv\dot x$ to get $\dot x=v,\ \dot v=f(x,v)$; in general $\dot q_1=f_1(q_1,q_2),\ \dot q_2=f_2(q_1,q_2)$
+    \item \textbf{Fixed points:} solve $f_1=f_2=0$ simultaneously
+    \item \textbf{Linearize once, generally:} build $A(q_1,q_2)$ symbolically (partials above)
+    \item \textbf{Evaluate $A$ at each fixed point separately} --- linearization is only locally valid, so every fixed point gets its own numeric Jacobian and its own classification
+    \item \textbf{Classify} each via $(\Delta,\tau)$ per the table above
+    \item \textbf{Eigenvectors} for saddle arrow directions --- solve $(A-\lambda I)\vec v=\vec 0$ per the box above
+    \item \textbf{Sketch:} plot each fixed point with its local behavior (node/spiral/saddle/center); nullclines $\dot x=0,\ \dot v=0$ partition the plane into regions of constant flow sign (trajectories never cross them except at fixed points); connect saddle separatrices to assemble the global portrait
+    \item \textbf{If a parameter $r$ is present}, repeat steps 2--7 across $r$ --- a bifurcation occurs exactly where an eigenvalue crosses zero ($\Delta=0$) or the imaginary axis ($\tau=0$ with $\Delta>0$, a \textbf{Hopf bifurcation}), the direct 2-D analogue of the 1-D bifurcation recipe above
+\end{enumerate}
 
 % ====================================================
 % NONDIMENSIONALIZATION
