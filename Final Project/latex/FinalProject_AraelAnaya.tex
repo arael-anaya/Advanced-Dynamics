@@ -1,0 +1,541 @@
+\documentclass[11pt]{article}
+
+% ====================================================
+% PACKAGES
+% ====================================================
+\usepackage[margin=0.85in, headheight=13.6pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{tcolorbox}
+\usepackage{amsmath, amssymb, mathtools}
+\usepackage{siunitx}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{indentfirst}
+\usepackage[justification=centering]{caption}
+\usepackage{listings}
+
+\lstdefinestyle{pystyle}{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue!50!black},
+    commentstyle=\color{green!40!black},
+    stringstyle=\color{orange!60!black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=8pt,
+    frame=single,
+    rulecolor=\color{gray!50},
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4
+}
+\lstset{style=pystyle}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\Assignment\ |\ \course}
+\rhead{\Name\ |\ \today}
+\cfoot{Page \thepage\ of~\pageref{LastPage}}
+
+\hypersetup{
+    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
+\newcommand{\Name}{Arael Anaya}
+\newcommand{\Assignment}{Final Project}
+\newcommand{\course}{Advanced Dynamics (MEGN505)}
+
+% Boxed final-answer environment (matches homework/update style)
+\newtcolorbox{result}{
+    colback=blue!3!white,
+    colframe=blue!40!black,
+    boxrule=0.6pt,
+    arc=2pt,
+    left=6pt, right=6pt, top=4pt, bottom=4pt
+}
+
+% Highlighted note box
+\newtcolorbox{noteBox}{
+    colback=blue!3!white,
+    colframe=blue!40!black,
+    boxrule=0.6pt,
+    arc=2pt,
+    left=6pt, right=6pt, top=4pt, bottom=4pt
+}
+
+% Placeholder box for work not yet completed -- flagged clearly for later passes
+\newtcolorbox{insertBox}[1]{
+    colback=red!4!white,
+    colframe=red!55!black,
+    boxrule=0.7pt,
+    arc=2pt,
+    left=6pt, right=6pt, top=5pt, bottom=5pt,
+    title={\textbf{[INSERT HERE --- #1]}},
+    fonttitle=\small\bfseries,
+    coltitle=red!55!black,
+}
+
+\setlength{\parskip}{0.3em}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+% ====================================================
+% TITLE
+% ====================================================
+\begin{center}
+    {\Large \textbf{Dynamics and Stability of the Spring-Loaded Inverted
+    Pendulum (SLIP) Model}}\\[2pt]
+    \Name
+\end{center}
+\vspace{-4pt}
+
+% ====================================================
+% 1. INTRODUCTION AND RELEVANCE
+% ====================================================
+\section{Introduction and Relevance}
+
+The spring-loaded inverted pendulum (SLIP) is the reduced-order model
+behind most legged-robot dynamics \cite{full1999,saranli2001}: a point
+mass bouncing on a massless spring leg. Despite its simplicity, it
+captures the center-of-mass dynamics of running in both animals and
+machines remarkably well \cite{blickhan1989,mcmahon1990}. That makes it
+a good subject for this course: it is simple enough to analyze fully
+with the tools covered here, but rich enough to produce genuinely
+interesting hybrid dynamics. It also builds directly on the elastic
+pendulum studied in class, since the stance phase of SLIP is an
+inverted spring pendulum.
+
+What makes SLIP especially interesting from a mechanics standpoint is
+that it is a hybrid dynamical system: during stance the body behaves
+like a spring-loaded pendulum, while in flight it is a free projectile,
+with the two phases connected by touchdown and liftoff switching
+conditions. Rather than analyzing stability at a fixed equilibrium
+point, the more natural question for a hopping gait is whether the
+periodic motion itself is stable. The standard tool for that is the
+apex return map, a Poincar\'e map in which a steady hopping gait
+appears as a fixed point whose stability can be assessed numerically
+\cite{blickhan1989,schwind2000}.
+
+Beyond being a convenient classroom system, SLIP-type models are used
+directly in the design and control of running robots and in the
+biomechanical study of animal and human locomotion, which is the
+practical motivation for this project: a model simple enough to
+analyze by hand but predictive enough to inform how a real legged
+system should be built or controlled.
+
+\subsection*{Relation to Prior Work}
+This project sits within an established line of SLIP research, and
+each stage of the model draws on a different piece of that literature.
+Blickhan \cite{blickhan1989} introduced the spring-mass template and
+showed that it reproduces the ground-reaction-force and center-of-mass
+patterns of human and animal running; the stance-phase Lagrangian
+derived here reproduces that same reduced-order model, but from
+Lagrange's equations in polar coordinates rather than Blickhan's
+Newtonian force balance. McMahon and Cheng \cite{mcmahon1990} used the
+same template to relate leg stiffness to running speed empirically;
+the parameter sweep over stiffness $k$ and touchdown angle
+$\theta_{TD}$ planned for this project asks the same question, but
+numerically, from the model directly, rather than from experimental
+data. Full and Koditschek's templates-and-anchors framework
+\cite{full1999} is the justification for treating SLIP as a legitimate
+object of study on its own, rather than only as a shortcut on the way
+to a fully articulated, multi-link leg model: a template is expected
+to capture the essential dynamics of the anchored system while
+discarding detail that does not matter for stability. Schwind and
+Koditschek \cite{schwind2000} derived an approximate, closed-form
+stance map for SLIP using a perturbative solution; this project instead
+integrates the stance-phase equations numerically with an event-based
+solver, trading their analytical insight for an exact (if less
+interpretable) stance map, consistent with the computational tools
+emphasized in this course. Saranli, Buehler, and Koditschek
+\cite{saranli2001} built RHex, a hexapod whose individual legs behave
+like a SLIP template during stance, which is the practical grounding
+for why this abstraction is worth studying: it is not just a toy
+system, it is the model actually used to understand a working robot.
+Finally, Geyer, Seyfarth, and Blickhan \cite{geyer2006} extended a
+SLIP-type compliant-leg model to walking, not just running, by allowing
+double support; that extension is a natural direction for future work
+beyond the single-support hopping model considered here.
+
+\begin{insertBox}{Additional literature comparison}
+Expand this comparison if needed to more explicitly satisfy the
+``at least 5 scholarly articles'' requirement with direct
+quantitative comparisons (e.g., comparing this project's stiffness
+sweep results directly against McMahon \& Cheng's reported
+stiffness--speed trend, or against Schwind \& Koditschek's
+closed-form stance-map approximation) once the parameter sweep in
+Section~\ref{sec:results} is complete.
+\end{insertBox}
+
+% ====================================================
+% 2. MODELING OF DYNAMICS
+% ====================================================
+\section{Modeling of Dynamics}
+
+The equations of motion for both phases of the SLIP model are derived
+using \textbf{Lagrange's equations of motion}, with generalized
+coordinates chosen separately for each phase: Cartesian coordinates
+$(x,y)$ for the flight phase, and polar coordinates $(r,\theta)$ about
+the planted foot for the stance phase. The two phases are connected by
+touchdown and liftoff switching (transversality) conditions, so the
+overall model is a hybrid dynamical system integrated with event-based
+numerical methods. Figure~\ref{fig:progress} shows the geometry of
+both phases.
+
+\begin{figure}[H]
+    \centering
+    \vspace{-4pt}
+    \includegraphics[width=0.55\linewidth]{Figures/progress_figure.png}
+    \vspace{-6pt}
+    \caption{\footnotesize SLIP model geometry: stance (spring pendulum,
+    $r,\theta$) and flight (projectile).}
+    \label{fig:progress}
+\end{figure}
+
+\subsection{Flight-Phase Equations of Motion}
+With basis $\hat n_1,\hat n_2$, $\vec r_m=x\hat n_1+y\hat n_2$:
+\[
+    T=\frac12 m(\dot x^2+\dot y^2), \qquad V=mgy, \qquad
+    L=T-V=\frac12m(\dot x^2+\dot y^2)-mgy
+\]
+Lagrange's equations give
+\begin{result}
+\[
+    \ddot x = 0, \qquad \ddot y = -g
+\]
+\end{result}
+Starting at the apex ($\dot y=0$), with $x(0)=x_0$, $\dot x(0)=v_{x0}$:
+\[
+    x(t)=v_{x0}t+x_0, \qquad y(t)=y_0-\frac{g}{2}t^2
+\]
+
+\subsection{Touchdown: Detection and Transition Map}
+$\theta_{TD}$ is held fixed in flight, so the foot trails the body at
+\[
+    \vec r_{foot}(t) = \big(x(t)-r_0\cos\theta_{TD}\big)\hat n_1
+    + \big(y(t)-r_0\sin\theta_{TD}\big)\hat n_2
+\]
+Touchdown is $y_{foot}=0$, i.e. $y_{TD}=r_0\sin\theta_{TD}$. Solving
+$y(t)=y_0-\tfrac g2t^2$:
+\begin{result}
+\[
+    t_{TD}=\sqrt{\frac{2(y_0-r_0\sin\theta_{TD})}{g}}, \qquad
+    \dot y_{TD}=-\sqrt{2g(y_0-r_0\sin\theta_{TD})}, \qquad
+    x_{TD}=v_{x0}t_{TD}, \qquad \dot x_{TD}=v_{x0}
+\]
+\end{result}
+Stance uses polar coordinates about the planted foot, so this Cartesian
+state must convert. With foot at
+$\vec r_F=(x_{TD}+r_0\cos\theta_{TD})\hat n_1$ and leg vector
+$\vec\rho=\vec r_m-\vec r_F=-r_0\cos\theta_{TD}\,\hat n_1+y_{TD}\hat n_2$:
+\[
+    r = |\vec\rho| = \sqrt{r_0^2\cos^2\theta_{TD}+y_{TD}^2} = r_0, \qquad
+    \theta = \operatorname{atan2}\!\big(y_{TD},\,-r_0\cos\theta_{TD}\big)
+\]
+Projecting $\vec v=\dot x_{TD}\hat n_1+\dot y_{TD}\hat n_2$ onto
+$\hat e_r=\cos\theta\,\hat n_1+\sin\theta\,\hat n_2$,
+$\hat e_\theta=-\sin\theta\,\hat n_1+\cos\theta\,\hat n_2$:
+\begin{result}
+\[
+    \dot r = \vec v\cdot\hat e_r = \dot x_{TD}\cos\theta+\dot y_{TD}\sin\theta,
+    \qquad
+    \dot\theta = \frac{\vec v\cdot\hat e_\theta}{r_0}
+    = \frac{-\dot x_{TD}\sin\theta+\dot y_{TD}\cos\theta}{r_0}
+\]
+\end{result}
+implemented as \texttt{touchdownState()}.
+
+\subsection{Stance-Phase Equations of Motion}
+In stance the leg pivots about the fixed foot: $\vec r_m=r\hat e_r$,
+$\vec v_m = \dot r\hat e_r+r\dot\theta\hat e_\theta$:
+\[
+    T=\frac12m\dot r^2+\frac12mr^2\dot\theta^2, \qquad
+    V=mgr\sin\theta+\frac12k(r-r_0)^2, \qquad
+    L=T-V
+\]
+Lagrange's equations:
+\begin{result}
+\[
+    m\ddot r-mr\dot\theta^2+mg\sin\theta+k(r-r_0)=0, \qquad
+    mr^2\ddot\theta+2mr\dot r\dot\theta+mgr\cos\theta=0
+\]
+\end{result}
+solved for the highest derivatives:
+\begin{result}
+\[
+    \ddot r = r\dot\theta^2-g\sin\theta-\frac{k}{m}(r-r_0), \qquad
+    \ddot\theta = -\frac{2}{r}\dot r\dot\theta-\frac{g}{r}\cos\theta
+\]
+\end{result}
+implemented as \texttt{stance\_RHS()}.
+
+\subsection{Conserved Energy in Stance}
+$\vec r_m=r\hat e_r$ is scleronomic and $T$ is homogeneous quadratic in
+$(\dot r,\dot\theta)$, so $H=T+V$; with no explicit $t$-dependence,
+energy is conserved through stance:
+\[
+    E = \frac12m(\dot r^2+r^2\dot\theta^2)+mgr\sin\theta
+    +\frac12k(r-r_0)^2 = \text{const.}
+\]
+Neither coordinate is cyclic, so both equations must be integrated
+together; this conserved quantity is used below as a check on the
+numerical integrator.
+
+\subsection{Liftoff Map and the Apex Return Map}
+\label{sec:returnmap}
+Liftoff occurs when the leg returns to its natural length with
+positive rate, $r=r_0,\ \dot r>0$, at which point the stance-phase
+state $(r_0,\theta_{LO},\dot r_{LO},\dot\theta_{LO})$ must be converted
+back into Cartesian flight variables to begin the next flight phase.
+Chaining flight $\to$ touchdown $\to$ stance $\to$ liftoff $\to$ flight
+once defines a map from one apex state to the next,
+$P:(y_{n},v_{x,n})\mapsto(y_{n+1},v_{x,n+1})$, whose fixed points
+correspond to steady periodic hopping and whose local stability is
+governed by the eigenvalues of the linearized (Jacobian) map about
+that fixed point.
+
+\begin{insertBox}{Liftoff-to-flight map and apex return map derivation}
+Derive the liftoff analogue of the touchdown map above (stance polar
+state $\to$ Cartesian $\dot x_{LO},\dot y_{LO}$, then propagate to the
+next apex to get $y_{n+1}$, $v_{x,n+1}$), define the apex return map
+$P$ explicitly as a function of $(k,\theta_{TD})$, and state the fixed
+point condition $P(y^\ast,v_x^\ast)=(y^\ast,v_x^\ast)$ used for the
+stability analysis in Section~\ref{sec:results}.
+\end{insertBox}
+
+% ====================================================
+% 3. DISCUSSION OF ASSUMPTIONS
+% ====================================================
+\section{Discussion of Assumptions}
+
+Several modeling choices were made to keep the SLIP model tractable
+with the tools of this course, each with a corresponding limitation:
+
+\begin{itemize}[leftmargin=1.4em]
+    \item \textbf{Planar motion.} The model is restricted to the
+    sagittal plane. Real running involves some lateral and rotational
+    motion of the trunk and legs, which this model cannot capture.
+    \item \textbf{Point mass, massless leg.} All body mass is lumped
+    at a single point, and the leg itself carries no mass or rotational
+    inertia. This isolates the center-of-mass dynamics that SLIP is
+    meant to describe, but discards any effect of leg-swing inertia or
+    trunk pitch, which the templates-and-anchors view
+    \cite{full1999} explicitly treats as detail that a template is
+    allowed to omit.
+    \item \textbf{Linear (Hookean) leg spring.} The stance leg is
+    modeled as a single ideal linear spring, $F=-k(r-r_0)$, with
+    constant stiffness $k$. Biological and robotic legs have leg
+    stiffness that is nonlinear and can be actively modulated
+    by the neuromuscular system or a controller; treating $k$ as a
+    fixed parameter to be swept is a simplification, not a claim that
+    real legs behave this way.
+    \item \textbf{Fixed touchdown angle held through flight.} $\theta_{TD}$
+    is assumed constant for the entire flight phase, i.e. there is no
+    swing-leg retraction or angle adjustment in response to a
+    disturbance before the foot lands. This is the standard SLIP
+    assumption, but it means the model's only ``control input'' between
+    hops is the touchdown angle chosen before each flight, not a
+    continuous correction during flight.
+    \item \textbf{Instantaneous, rigid, non-slipping foot placement.}
+    Touchdown and liftoff are treated as instantaneous events with no
+    impact losses, and the foot is assumed to stick to the ground
+    (no slipping, no ground compliance) for the duration of stance at
+    a fixed height $y=0$. Real contact involves finite compliance and
+    a friction cone that could, in principle, be violated at high
+    touchdown angles or high speeds.
+    \item \textbf{No stance-phase dissipation, no aerodynamic drag.}
+    The stance-phase Lagrangian has no damping term, so mechanical
+    energy is exactly conserved within a single stance phase (verified
+    numerically in Section~\ref{sec:results}); flight is likewise
+    treated as drag-free projectile motion. This was a deliberate
+    choice: it isolates the elastic dynamics of interest and gives a
+    clean, near-machine-precision check on the numerical integrator,
+    at the cost of neglecting the fact that any real leg or running
+    surface dissipates some energy each stride.
+    \item \textbf{Equal rest length at touchdown and liftoff.} The leg
+    is assumed to return to the same natural length $r_0$ between hops,
+    with no active leg extension/retraction actuation changing that
+    rest length from one stance phase to the next.
+\end{itemize}
+
+\begin{insertBox}{Additional justification / limitations discussion}
+If time allows, discuss which of the assumptions above are most
+consequential for the stability results in Section~\ref{sec:results}
+(e.g., does relaxing the zero-damping assumption change which
+$(k,\theta_{TD})$ combinations are stable?), and note anywhere the
+numerical results below reveal a limitation of the model (such as
+touchdown angles/speeds that would violate a real friction cone).
+\end{insertBox}
+
+% ====================================================
+% 4. COMPUTATIONAL RESULTS
+% ====================================================
+\section{Computational Results}
+\label{sec:results}
+
+\subsection{Single-Stance Validation}
+The model is implemented in Python. \texttt{main.py} maps an apex
+state to the stance-phase initial condition via
+\texttt{touchdownState()}, then integrates \texttt{stance\_RHS()} with
+\texttt{solve\_ivp} ($\texttt{rtol}=10^{-10}$,
+$\texttt{atol}=10^{-12}$) to the liftoff event $r=r_0,\ \dot r>0$,
+checking the conserved energy from Section~2.4 at every step. Using
+the parameters below, this validates the stance-phase model end to
+end:
+\begin{center}
+\begin{tabular}{@{}ccccccc@{}}
+\toprule
+$m$ & $r_0$ & $k$ & $g$ & $\theta_{TD}$ & $y_0$ & $v_{x0}$ \\
+\midrule
+80 kg & 1 m & 20000 N/m & 9.81 m/s$^2$ & $68^\circ$ & 1.2 m & 3.0 m/s \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{center}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & $r$ [m] & $\theta$ [deg] & $\dot r$ [m/s] & $\dot\theta$ [rad/s] \\
+\midrule
+Touchdown & 1.0000 & 112.00 & $-3.2689$ & $-1.9149$ \\
+Liftoff   & 1.0000 &  83.48 & $\phantom{-}3.1937$ & $-1.6886$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Stance lasts $0.2094\,$s; the leg compresses to $0.7740\,$m ($22.6\%$
+of $r_0$); relative energy drift is $6.46\times10^{-13}$, i.e. machine
+precision, confirming that the integrator and the equations of motion
+in Section~2.3 are consistent. Figure~\ref{fig:stance} plots leg
+length, angle, CoM trajectory, and energy drift for this run.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{Figures/Graphs/stance_validation.png}
+    \caption{\footnotesize Stance simulation: $r(t)$, $\theta(t)$ (top),
+    CoM trajectory (bottom left), energy drift (bottom right).}
+    \label{fig:stance}
+\end{figure}
+
+\subsection{Apex Return Map, Phase Space, and Parameter Sweep}
+\begin{insertBox}{Multi-hop simulation and apex return map results}
+Once Section~\ref{sec:returnmap}'s liftoff/return map is implemented,
+populate this subsection with:
+\begin{itemize}[leftmargin=1.4em]
+    \item A phase-space plot (e.g. $\dot\theta$ vs.\ $\theta$, or
+    successive apex heights $y_{n+1}$ vs.\ $y_n$) showing convergence
+    to a fixed point of the apex return map for at least one
+    stable $(k,\theta_{TD})$ combination.
+    \item A sweep over spring stiffness $k$ and touchdown angle
+    $\theta_{TD}$, reporting which combinations produce a stable
+    steady hopping gait (e.g.\ eigenvalues of the linearized return
+    map inside the unit circle) and which do not.
+    \item A short interpretation of the sweep: does stability match
+    the qualitative stiffness--speed trend reported by McMahon and
+    Cheng \cite{mcmahon1990}? Are there touchdown angles that fail
+    even though the single-stance dynamics are otherwise well
+    behaved?
+\end{itemize}
+\end{insertBox}
+
+% ====================================================
+% 5. LESSONS LEARNED
+% ====================================================
+\section{Lessons Learned}
+
+\begin{insertBox}{Lessons learned discussion}
+Address all three of the following once the project is complete:
+\begin{enumerate}[leftmargin=1.4em]
+    \item \textbf{Benefits and limitations of the chosen approach.}
+    What did the Lagrangian/generalized-coordinates + event-based
+    hybrid-integration approach make easy, and where did it break down
+    or require extra care (e.g.\ the touchdown/liftoff coordinate
+    conversions, or the accuracy demands of chaining many hops through
+    the return map)?
+    \item \textbf{What was learned by modeling this system.} E.g.\
+    anything surprising about the stance dynamics, the sensitivity of
+    the return map to $(k,\theta_{TD})$, or the practical challenges of
+    event-based integration that weren't obvious before doing this
+    project.
+    \item \textbf{Which course learning outcomes this project
+    demonstrates.} Connect explicitly back to specific MEGN505 learning
+    outcomes (Lagrangian mechanics, generalized coordinates,
+    constraints, stability of periodic motion via Poincar\'e maps,
+    numerical simulation of dynamical systems, etc.).
+\end{enumerate}
+\end{insertBox}
+
+% ====================================================
+% REFERENCES
+% ====================================================
+\newpage
+\footnotesize
+\begin{thebibliography}{9}
+\setlength{\itemsep}{0pt}
+\bibitem{blickhan1989}
+R.~Blickhan, ``The spring-mass model for running and hopping,''
+\textit{Journal of Biomechanics}, vol.~22, no.~11--12, pp.~1217--1227,
+1989.
+\bibitem{mcmahon1990}
+T.~A.~McMahon and G.~C.~Cheng, ``The mechanics of running: how does
+stiffness couple with speed?,'' \textit{Journal of Biomechanics},
+vol.~23, suppl.~1, pp.~65--78, 1990.
+\bibitem{full1999}
+R.~J.~Full and D.~E.~Koditschek, ``Templates and anchors:
+neuromechanical hypotheses of legged locomotion on land,''
+\textit{Journal of Experimental Biology}, vol.~202, no.~23,
+pp.~3325--3332, 1999.
+\bibitem{schwind2000}
+W.~J.~Schwind and D.~E.~Koditschek, ``Approximating the stance map of
+a 2-DOF monoped runner,'' \textit{Journal of Nonlinear Science},
+vol.~10, pp.~533--568, 2000.
+\bibitem{saranli2001}
+U.~Saranli, M.~Buehler, and D.~E.~Koditschek, ``RHex: a simple and
+highly mobile hexapod robot,'' \textit{International Journal of
+Robotics Research}, vol.~20, no.~7, pp.~616--631, 2001.
+\bibitem{geyer2006}
+H.~Geyer, A.~Seyfarth, and R.~Blickhan, ``Compliant leg behaviour
+explains basic dynamics of walking and running,'' \textit{Proceedings
+of the Royal Society B}, vol.~273, no.~1603, pp.~2861--2867, 2006.
+\end{thebibliography}
+
+% ====================================================
+% APPENDIX
+% ====================================================
+\normalsize
+
+\appendix
+\section*{Appendix: Code}
+\texttt{main.py} -- touchdown map, stance-phase RHS, and the
+single-stance simulation and validation plots discussed in
+Section~4.1.
+\lstinputlisting[style=pystyle]{../main.py}
+
+\begin{insertBox}{Return map / parameter sweep code}
+Once written, add the liftoff-map and apex-return-map / parameter
+sweep script here (e.g.\ \texttt{return\_map.py}) with a matching
+\texttt{lstinputlisting} entry, alongside a short note describing
+what it computes.
+\end{insertBox}
+
+\end{document}

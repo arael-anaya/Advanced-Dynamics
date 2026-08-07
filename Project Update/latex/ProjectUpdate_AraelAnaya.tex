@@ -29,6 +29,25 @@
 \usepackage{lastpage}
 \usepackage{indentfirst}
 \usepackage[justification=centering]{caption}
+\usepackage{listings}
+
+\lstdefinestyle{pystyle}{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue!50!black},
+    commentstyle=\color{green!40!black},
+    stringstyle=\color{orange!60!black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=8pt,
+    frame=single,
+    rulecolor=\color{gray!50},
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4
+}
+\lstset{style=pystyle}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -56,6 +75,15 @@
     left=6pt, right=6pt, top=4pt, bottom=4pt
 }
 
+% Boxed final-answer environment (matches homework style)
+\newtcolorbox{result}{
+    colback=blue!3!white,
+    colframe=blue!40!black,
+    boxrule=0.6pt,
+    arc=2pt,
+    left=6pt, right=6pt, top=4pt, bottom=4pt
+}
+
 \setlength{\parskip}{0.25em}
 \setlength{\parindent}{0pt}
 
@@ -74,52 +102,172 @@
 % (a) MOTIVATION
 % ====================================================
 \subsection*{(a) System and Motivation}
-For my final project I am modeling the spring-loaded inverted pendulum
-(SLIP) model of a hopping/running robot -- the reduced-order model that
-underlies essentially all legged-robot dynamics. Despite its simplicity (a
-point mass bouncing on a massless spring leg), the SLIP model captures the
-center-of-mass dynamics of running in both animals and machines
-remarkably well, making it simple enough to analyze rigorously with the
-tools from this course while still producing rich, interesting behavior.
-It also builds naturally on the elastic pendulum system studied in class,
-since the stance phase is essentially an inverted spring pendulum.
+This project models the spring-loaded inverted pendulum (SLIP), the
+reduced-order model behind most legged-robot dynamics
+\cite{full1999,saranli2001}: a point mass bouncing on a massless
+spring leg. It captures real running dynamics well
+\cite{blickhan1989,mcmahon1990} while staying simple enough to analyze
+with this course's tools. The stance phase is an inverted spring
+pendulum, extending the elastic pendulum from class.
 
-% ====================================================
-% (b) METHODS
-% ====================================================
+=====
 \subsection*{(b) Modeling Methods}
-The SLIP model is a hybrid dynamical system, shown schematically in
-Figure~\ref{fig:progress}: during stance the body behaves as a
-spring-loaded pendulum, while during flight it is simply a projectile. I
-am deriving the equations of motion for each phase using the Lagrangian
-formulation in polar coordinates $(r,\theta)$ for the stance phase,
-together with the switching conditions at touchdown and liftoff that
-connect the two phases. To assess stability of the hopping gait itself
-(rather than just a single equilibrium), I will use an apex return map --
-a Poincar\'e map in which a periodic hopping gait appears as a fixed point
-whose stability can be evaluated numerically \cite{blickhan1989}. The
-model will be implemented in Python using event-based numerical
-integration, with a parameter study over spring stiffness and touchdown
+The SLIP model is hybrid (Figure~\ref{fig:progress}): a spring-loaded
+pendulum in stance, a projectile in flight. Each phase's equations of
+motion come from the Lagrangian, in polar coordinates $(r,\theta)$ for
+stance, plus the touchdown/liftoff switching conditions connecting
+them. Gait stability is assessed with an apex return map -- a
+Poincar\'e map where a periodic hop is a fixed point
+\cite{blickhan1989,schwind2000}. The model runs in Python with
+event-based integration, sweeping spring stiffness and touchdown
 angle.
 
-% ====================================================
-% (c) PROGRESS
-% ====================================================
+
 \subsection*{(c) Progress to Date}
-TODO: Summarize the progress made so far -- e.g., which equations of
-motion have been derived, whether the touchdown/liftoff switching
-conditions are implemented, whether the Python simulation runs, and any
-preliminary results (e.g., a first stance-phase trajectory or return-map
-point).
+Both phases' equations of motion and the touchdown map are derived
+below and implemented in \texttt{main.py} as
+\texttt{touchdownState()} and \texttt{stance\_RHS()}.
+Figure~\ref{fig:progress} shows the geometry.
+
+\subsubsection*{Flight-Phase Equations of Motion}
+With basis $\hat n_1,\hat n_2$, $\vec r_m=x\hat n_1+y\hat n_2$:
+\[
+    T=\frac12 m(\dot x^2+\dot y^2), \qquad V=mgy, \qquad
+    L=T-V=\frac12m(\dot x^2+\dot y^2)-mgy
+\]
+Lagrange's equations give
+\begin{result}
+\[
+    \ddot x = 0, \qquad \ddot y = -g
+\]
+\end{result}
+Starting at the apex ($\dot y=0$), with $x(0)=x_0$, $\dot x(0)=v_{x0}$:
+\[
+    x(t)=v_{x0}t+x_0, \qquad y(t)=y_0-\frac{g}{2}t^2
+\]
+
+\subsubsection*{Touchdown: Detection and Transition Map}
+$\theta_{TD}$ is held fixed in flight, so the foot trails the body at
+\[
+    \vec r_{foot}(t) = \big(x(t)-r_0\cos\theta_{TD}\big)\hat n_1
+    + \big(y(t)-r_0\sin\theta_{TD}\big)\hat n_2
+\]
+Touchdown is $y_{foot}=0$, i.e. $y_{TD}=r_0\sin\theta_{TD}$. Solving
+$y(t)=y_0-\tfrac g2t^2$:
+\begin{result}
+\[
+    t_{TD}=\sqrt{\frac{2(y_0-r_0\sin\theta_{TD})}{g}}, \qquad
+    \dot y_{TD}=-\sqrt{2g(y_0-r_0\sin\theta_{TD})}, \qquad
+    x_{TD}=v_{x0}t_{TD}, \qquad \dot x_{TD}=v_{x0}
+\]
+\end{result}
+Stance uses polar coordinates about the planted foot, so this Cartesian
+state must convert. With foot at
+$\vec r_F=(x_{TD}+r_0\cos\theta_{TD})\hat n_1$ and leg vector
+$\vec\rho=\vec r_m-\vec r_F=-r_0\cos\theta_{TD}\,\hat n_1+y_{TD}\hat n_2$:
+\[
+    r = |\vec\rho| = \sqrt{r_0^2\cos^2\theta_{TD}+y_{TD}^2} = r_0, \qquad
+    \theta = \operatorname{atan2}\!\big(y_{TD},\,-r_0\cos\theta_{TD}\big)
+\]
+Projecting $\vec v=\dot x_{TD}\hat n_1+\dot y_{TD}\hat n_2$ onto
+$\hat e_r=\cos\theta\,\hat n_1+\sin\theta\,\hat n_2$,
+$\hat e_\theta=-\sin\theta\,\hat n_1+\cos\theta\,\hat n_2$:
+\begin{result}
+\[
+    \dot r = \vec v\cdot\hat e_r = \dot x_{TD}\cos\theta+\dot y_{TD}\sin\theta,
+    \qquad
+    \dot\theta = \frac{\vec v\cdot\hat e_\theta}{r_0}
+    = \frac{-\dot x_{TD}\sin\theta+\dot y_{TD}\cos\theta}{r_0}
+\]
+\end{result}
+implemented as \texttt{touchdownState()}.
+
+\subsubsection*{Stance-Phase Equations of Motion}
+In stance the leg pivots about the fixed foot: $\vec r_m=r\hat e_r$,
+$\vec v_m = \dot r\hat e_r+r\dot\theta\hat e_\theta$:
+\[
+    T=\frac12m\dot r^2+\frac12mr^2\dot\theta^2, \qquad
+    V=mgr\sin\theta+\frac12k(r-r_0)^2, \qquad
+    L=T-V
+\]
+Lagrange's equations:
+\begin{result}
+\[
+    m\ddot r-mr\dot\theta^2+mg\sin\theta+k(r-r_0)=0, \qquad
+    mr^2\ddot\theta+2mr\dot r\dot\theta+mgr\cos\theta=0
+\]
+\end{result}
+solved for the highest derivatives:
+\begin{result}
+\[
+    \ddot r = r\dot\theta^2-g\sin\theta-\frac{k}{m}(r-r_0), \qquad
+    \ddot\theta = -\frac{2}{r}\dot r\dot\theta-\frac{g}{r}\cos\theta
+\]
+\end{result}
+implemented as \texttt{stance\_RHS()}.
+
+\subsubsection*{Conserved Energy in Stance}
+$\vec r_m=r\hat e_r$ is scleronomic and $T$ is homogeneous quadratic in
+$(\dot r,\dot\theta)$, so $H=T+V$; with no explicit $t$-dependence,
+energy is conserved through stance:
+\[
+    E = \frac12m(\dot r^2+r^2\dot\theta^2)+mgr\sin\theta
+    +\frac12k(r-r_0)^2 = \text{const.}
+\]
+Neither coordinate is cyclic, so both equations must be integrated
+together; this conserved energy checks the integrator.
+
+\subsubsection*{Numerical Results}
+Parameters:
+\begin{center}
+\begin{tabular}{@{}ccccccc@{}}
+\toprule
+$m$ & $r_0$ & $k$ & $g$ & $\theta_{TD}$ & $y_0$ & $v_{x0}$ \\
+\midrule
+80 kg & 1 m & 20000 N/m & 9.81 m/s$^2$ & $68^\circ$ & 1.2 m & 3.0 m/s \\
+\bottomrule
+\end{tabular}
+\end{center}
+\texttt{main.py} maps the apex state to stance via
+\texttt{touchdownState()}, integrates \texttt{stance\_RHS()} with
+\texttt{solve\_ivp} ($\texttt{rtol}=10^{-10}$, $\texttt{atol}=10^{-12}$)
+to the liftoff event $r=r_0,\ \dot r>0$, checking energy at every step:
+\begin{center}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & $r$ [m] & $\theta$ [deg] & $\dot r$ [m/s] & $\dot\theta$ [rad/s] \\
+\midrule
+Touchdown & 1.0000 & 112.00 & $-3.2689$ & $-1.9149$ \\
+Liftoff   & 1.0000 &  83.48 & $\phantom{-}3.1937$ & $-1.6886$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Stance lasts $0.2094\,$s; the leg compresses to $0.7740\,$m ($22.6\%$
+of $r_0$); relative energy drift is $6.46\times10^{-13}$, i.e. machine
+precision. Figure~\ref{fig:stance} plots leg length, angle, CoM
+trajectory, and energy drift.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{Figures/Graphs/stance_validation.png}
+    \caption{\footnotesize Stance simulation: $r(t)$, $\theta(t)$ (top),
+    CoM trajectory (bottom left), energy drift (bottom right).}
+    \label{fig:stance}
+\end{figure}
+
+\subsubsection*{Remaining Work}
+This single-stance simulation is validated end to end. Remaining: map
+liftoff back to flight variables, chain hops into the apex return map
+from part (b) \cite{geyer2006}, then sweep $(k,\theta_{TD})$ for stable
+gaits.
 
 \begin{figure}[H]
     \centering
     \vspace{-4pt}
     \includegraphics[width=0.55\linewidth]{Figures/progress_figure.png}
     \vspace{-6pt}
-    \caption{\footnotesize Schematic of the SLIP model's two-phase hybrid
-    dynamics: stance (spring-loaded pendulum in polar coordinates
-    $r,\theta$) and flight (ballistic projectile).}
+    \caption{\footnotesize SLIP model geometry: stance (spring pendulum,
+    $r,\theta$) and flight (projectile).}
     \label{fig:progress}
 \end{figure}
 \vspace{-8pt}
@@ -128,12 +276,14 @@ point).
 % MEETING NOTE
 % ====================================================
 \begin{noteBox}
-\small\textbf{Scheduled update meeting:} TODO -- day, date, and time.
+\small\textbf{Scheduled update meeting:} Friday, August 7, 2026,
+10:30--11:00 AM, with Gary Nave (remote).
 \end{noteBox}
 
 % ====================================================
 % REFERENCES
 % ====================================================
+\newpage
 \footnotesize
 \begin{thebibliography}{9}
 \setlength{\itemsep}{0pt}
@@ -141,6 +291,38 @@ point).
 R.~Blickhan, ``The spring-mass model for running and hopping,''
 \textit{Journal of Biomechanics}, vol.~22, no.~11--12, pp.~1217--1227,
 1989.
+\bibitem{mcmahon1990}
+T.~A.~McMahon and G.~C.~Cheng, ``The mechanics of running: how does
+stiffness couple with speed?,'' \textit{Journal of Biomechanics},
+vol.~23, suppl.~1, pp.~65--78, 1990.
+\bibitem{full1999}
+R.~J.~Full and D.~E.~Koditschek, ``Templates and anchors:
+neuromechanical hypotheses of legged locomotion on land,''
+\textit{Journal of Experimental Biology}, vol.~202, no.~23,
+pp.~3325--3332, 1999.
+\bibitem{schwind2000}
+W.~J.~Schwind and D.~E.~Koditschek, ``Approximating the stance map of
+a 2-DOF monoped runner,'' \textit{Journal of Nonlinear Science},
+vol.~10, pp.~533--568, 2000.
+\bibitem{saranli2001}
+U.~Saranli, M.~Buehler, and D.~E.~Koditschek, ``RHex: a simple and
+highly mobile hexapod robot,'' \textit{International Journal of
+Robotics Research}, vol.~20, no.~7, pp.~616--631, 2001.
+\bibitem{geyer2006}
+H.~Geyer, A.~Seyfarth, and R.~Blickhan, ``Compliant leg behaviour
+explains basic dynamics of walking and running,'' \textit{Proceedings
+of the Royal Society B}, vol.~273, no.~1603, pp.~2861--2867, 2006.
 \end{thebibliography}
+
+% ====================================================
+% APPENDIX
+% ====================================================
+\normalsize
+
+\appendix
+\section*{Appendix: Code}
+\texttt{main.py} -- touchdown map, stance-phase RHS, and the
+single-stance simulation and validation plots discussed in (c).
+\lstinputlisting[style=pystyle]{../../Final Project/main.py}
 
 \end{document}
