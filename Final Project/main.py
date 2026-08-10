@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
@@ -247,12 +248,12 @@ def apexmap(y , thetaTD, params, E):
 
 # ---------- find the fixed point of the apex map and its local stability ----------
 
-def findApexMapFixedPoint():
+def findApexMapFixedPoint(params, thetaTD, y_o=y_o, v_o=v_o):
     initialState = [0,y_o,v_o,0]
     E = energyHop(initialState, params)
     f = lambda y: apexmap(y, thetaTD, params , E) - y
 
-    y_min = params['r_o'] * np.sin(thetaTD)  # apex must be at/above touchdown height for this thetaTD
+    y_min = params['r_o'] * np.sin(thetaTD) + .001 # apex must be at/above touchdown height for this thetaTD
     # 2E/m - 2*g*y ≥ 0
     #  Y < 2E/ (2mg)
     y_max = 2*E / (2* params['m'] * params['g'])
@@ -262,19 +263,46 @@ def findApexMapFixedPoint():
 
     sign_changes = np.where(np.diff(np.sign(f_sample)) != 0)[0]
 
-    # print(sign_changes)
-    y_min = y_sample[sign_changes]
-    y_max = y_sample[sign_changes+1]
+    if sign_changes.size == 0:
+        raise ValueError(f"no sign change in apex map for thetaTD={thetaTD}, k={params['k']}")
+
+    y_min = y_sample[sign_changes[0]]
+    y_max = y_sample[sign_changes[0] + 1]
 
     y_star = brentq(f, y_min, y_max)
     dy = .001
 
     apexmapPrime = (apexmap(y_star + dy, thetaTD, params, E) - apexmap(y_star - dy, thetaTD, params, E)) / (2 * dy) # type: ignore
 
-    print(apexmapPrime)
+    # print(apexmapPrime)
 
-    
-# NEXT STAGE
+    return (y_star, apexmapPrime)
+
+
+# ============================================================
+# Stage 6 - Grid search: fixed point and stability over (k, thetaTD)
+# Each grid point needs its own params dict (deep-copied off the
+# base params) so sweeping 'k' never mutates the shared dict that
+# other stages/functions read from.
+# ============================================================
+
+def gridSearchFixedPoints(base_params, k_values, thetaTD_values, y_o=y_o, v_o=v_o):
+    y_star_grid = np.full((len(k_values), len(thetaTD_values)), np.nan)
+    slope_grid = np.full((len(k_values), len(thetaTD_values)), np.nan)
+
+    for i, k_val in enumerate(k_values):
+        for j, theta_val in enumerate(thetaTD_values):
+            trial_params = copy.deepcopy(base_params)
+            trial_params['k'] = k_val
+            try:
+                y_star, slope = findApexMapFixedPoint(trial_params, theta_val, y_o, v_o)
+            except ValueError:
+                continue
+            y_star_grid[i, j] = y_star
+            slope_grid[i, j] = slope
+
+    return y_star_grid, slope_grid
+
 
 # ============================================================
 # Run
@@ -283,4 +311,10 @@ def findApexMapFixedPoint():
 if __name__ == "__main__":
 #     initialFunctionTest()
 #     proveX_dotIsRedundant()
-    findApexMapFixedPoint()
+    print(findApexMapFixedPoint(params, thetaTD))
+
+    k_sweep = np.linspace(5000, 40000, 5)
+    thetaTD_sweep = np.linspace(np.radians(50), np.radians(80), 5)
+    y_star_grid, slope_grid = gridSearchFixedPoints(params, k_sweep, thetaTD_sweep)
+    print("y_star grid:\n", y_star_grid)
+    print("slope grid:\n", slope_grid)
