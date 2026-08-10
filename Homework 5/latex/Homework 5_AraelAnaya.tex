@@ -86,6 +86,22 @@
     {\begin{quote}\itshape Source file \texttt{#1} not found yet --- this
         listing will populate automatically once the file is written.\end{quote}}}
 
+% Phase-portrait figure: drops in automatically once the file exists at
+% the given path, otherwise shows a labeled placeholder box so the
+% document still compiles cleanly.
+\newcommand{\PhasePortrait}[4][0.7\linewidth]{%
+\begin{figure}[H]
+    \centering
+    \IfFileExists{#2}%
+        {\includegraphics[width=#1]{#2}}%
+        {\fbox{\begin{minipage}[c][6cm][c]{0.65\linewidth}
+            \centering\itshape Phase portrait pending --- save figure to:\\
+            \texttt{\detokenize{#2}}
+        \end{minipage}}}%
+    \caption{#3}
+    \label{#4}
+\end{figure}}
+
 \begin{document}
 
 % ====================================================
@@ -97,6 +113,102 @@
     \centering
     \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 1.png}
 \end{figure}
+
+\subsection*{(a) Sliding without friction}
+
+With $x$ the stretch in the spring, $V=\frac12kx^2$ (the natural-length offset $-\frac12kx_0^2$ is just a constant and drops out of the dynamics):
+\[
+L=\frac12 M\dot x^2-\frac12kx^2
+\]
+
+Euler--Lagrange gives the equation of motion:
+\[
+M\ddot x+kx=0
+\]
+
+State space, with $v=\dot x$:
+\[
+\dot x = v, \qquad \dot v = -\frac{k}{M}x
+\]
+Equilibrium: $(x,v)=(0,0)$.
+
+\[
+J=\begin{bmatrix}0&1\\[2pt]-\dfrac{k}{M}&0\end{bmatrix},
+\qquad \tau=\operatorname{tr}J=0, \qquad \Delta=\det J=\frac{k}{M}
+\]
+
+\[
+\lambda=\frac{\tau\pm\sqrt{\tau^2-4\Delta}}{2}=\pm\sqrt{\frac{k}{M}}\,i
+\]
+
+\begin{result}
+The eigenvalues are purely imaginary, so the origin is a \textbf{center}. Trajectories are closed orbits (ellipses in the $x$--$v$ plane) that encircle the origin: with no dissipation, the mass oscillates forever at constant energy.
+\end{result}
+
+\PhasePortrait{Figures/Phase Portraits/Problem1a.png}{Phase portrait for Problem 1(a): frictionless sliding.}{fig:p1a}
+
+\subsection*{(b) With a linear damper}
+
+Newton's second law:
+\[
+-kx-b\dot x=M\ddot x \qquad\Longrightarrow\qquad \ddot x=-\frac{b}{M}\dot x-\frac{k}{M}x
+\]
+
+State space:
+\[
+\dot x=v,\qquad \dot v=-\frac{b}{M}v-\frac{k}{M}x
+\]
+Equilibrium: $(x,v)=(0,0)$.
+
+\[
+J=\begin{bmatrix}0&1\\[2pt]-\dfrac{k}{M}&-\dfrac{b}{M}\end{bmatrix},
+\qquad \tau=-\frac{b}{M}, \qquad \Delta=\frac{k}{M}
+\]
+
+Since $M,b,k>0$, $\tau<0$ always $\Rightarrow$ the equilibrium is always stable. The character of that stable equilibrium depends on the sign of the discriminant $\tau^2-4\Delta$:
+\[
+\frac{b^2}{M^2}-\frac{4k}{M}=0 \qquad\Longrightarrow\qquad b_{cr}=2\sqrt{kM}
+\]
+
+\begin{result}
+\[
+\begin{aligned}
+b>2\sqrt{kM}&: \text{ overdamped, \textbf{stable node}} \\
+b=2\sqrt{kM}&: \text{ critically damped, \textbf{degenerate (improper) node} --- the boundary case} \\
+b<2\sqrt{kM}&: \text{ underdamped, \textbf{stable spiral}}
+\end{aligned}
+\]
+\end{result}
+
+At $b=b_{cr}=2\sqrt{kM}$ the discriminant $\tau^2-4\Delta$ vanishes and the two eigenvalues coalesce into the repeated root $\lambda=-b_{cr}/(2M)=-\sqrt{k/M}$: the two straight eigendirections of the overdamped node merge into one, and trajectories approach the origin tangent to that single direction without oscillating --- the fastest possible non-oscillatory decay, sitting exactly on the boundary between the node and the spiral.
+
+Eigenvector directions, from
+\[
+\begin{bmatrix}-\lambda&1\\[2pt]-\dfrac{k}{M}&-\dfrac{b}{M}-\lambda\end{bmatrix}
+\begin{bmatrix}v_1\\v_2\end{bmatrix}=0
+\qquad\Longrightarrow\qquad v_1\lambda=v_2,
+\]
+i.e.\ $v=\lambda x$ along each eigendirection, with $\lambda<0$ for both roots in the overdamped case.
+
+\PhasePortrait[\linewidth]{Figures/Phase Portraits/Problem1b.png}{Phase portraits for Problem 1(b): underdamped ($b<2\sqrt{kM}$, stable spiral, left), critically damped ($b=2\sqrt{kM}$, degenerate node with the coalesced eigendirection, center), and overdamped ($b>2\sqrt{kM}$, stable node with fast/slow eigendirections, right).}{fig:p1b}
+
+\subsection*{(c) With Coulomb friction}
+
+For $\dot x>0$:
+\[
+M\ddot x=-kx-\mu N=-k\left(x+\frac{\mu N}{k}\right) \qquad\Longrightarrow\qquad \text{zero at } x=-\frac{\mu N}{k}
+\]
+
+For $\dot x<0$:
+\[
+M\ddot x=-kx+\mu N=-k\left(x-\frac{\mu N}{k}\right) \qquad\Longrightarrow\qquad \text{zero at } x=\frac{\mu N}{k}
+\]
+
+\begin{result}
+The system behaves like an undamped spring-mass oscillating about a fictitious center at $\mp\mu N/k$, depending on the sign of the velocity. In the phase plane the trajectory is a sequence of nested half-circles, alternating about the two centers $\pm\mu N/k$, that shrink by a constant amount each swing until the amplitude falls inside the ``dead band'' $|x|\le \mu N/k$ --- a whole line of fixed points, not an isolated one, since static friction can hold the mass anywhere in that range --- where the mass sticks and motion stops in finite time.
+\end{result}
+
+\PhasePortrait{Figures/Phase Portraits/Problem1c.png}{Phase portrait for Problem 1(c): Coulomb friction.}{fig:p1c}
 
 
 % ====================================================
@@ -110,9 +222,137 @@
     \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 2.png}
 \end{figure}
 
+\subsection*{(a) Equation of motion via Lagrange's equations}
+
+Generalized coordinate: $x$ (the bead's position along the tube, i.e.\ $r$). The post angle $\theta$ is fixed by the geometry (welded post), so we write it as the constant $\theta_0$ throughout, with $\theta_0=60^\circ$ only plugged in numerically at the end.
+\[
+\vec r = x\,\hat e_r, \qquad
+\dot{\vec r} = \dot x\,\hat e_r + x\,\dot{\hat e}_r
+\]
+
+The post spins about the fixed vertical axis $\hat\imath_3$ at rate $\dot\phi=\Omega$, carrying $\hat e_r$ with it, so $\dot{\hat e}_r=\Omega\,\hat\imath_3\times\hat e_r=\Omega\sin\theta_0\,\hat e_\phi$ (the standard result for a unit vector making the fixed angle $\theta_0$ with the spin axis $\hat\imath_3$), where $\hat e_\phi$ is the azimuthal direction shown in the figure. Since $\hat e_r\perp\hat e_\phi$:
+\[
+\dot{\vec r}=\dot x\,\hat e_r+\Omega x\sin\theta_0\,\hat e_\phi
+\qquad\Longrightarrow\qquad
+|\dot{\vec r}|^2=\dot x^2+\Omega^2x^2\sin^2\theta_0
+\]
+
+\[
+T=\frac12M\left(\dot x^2+\Omega^2x^2\sin^2\theta_0\right), \qquad V=Mgx\cos\theta_0
+\]
+\[
+L=T-V=\frac12M\dot x^2+\frac12M\Omega^2x^2\sin^2\theta_0-Mgx\cos\theta_0
+\]
+
+Euler--Lagrange: $\dfrac{d}{dt}\!\left(\dfrac{\partial L}{\partial \dot x}\right)-\dfrac{\partial L}{\partial x}=0$
+
+\begin{result}
+\[
+M\ddot x-\Omega^2M\sin^2\theta_0\,x+Mg\cos\theta_0=0
+\]
+\end{result}
+
+\subsection*{(b) Non-dimensionalization}
+
+\[
+\ddot x=\Omega^2\sin^2\theta_0\,x-g\cos\theta_0
+\]
+
+Let $x=Lu$, $t=T\varsigma$, so $\dfrac{d^2x}{dt^2}=\dfrac{L}{T^2}\dfrac{d^2u}{d\varsigma^2}$:
+\[
+\frac{L}{T^2}u''=\Omega^2\sin^2\theta_0\,Lu-g\cos\theta_0
+\qquad\Longrightarrow\qquad
+u''=T^2\Omega^2\sin^2\theta_0\,u-\frac{T^2g\cos\theta_0}{L}
+\]
+
+Choose the scalings so both coefficients become $1$:
+\[
+T^2\Omega^2\sin^2\theta_0=1 \ \Rightarrow\ T=\frac{1}{\Omega\sin\theta_0},
+\qquad\qquad
+\frac{T^2g\cos\theta_0}{L}=1 \ \Rightarrow\ L=\frac{g\cos\theta_0}{\Omega^2\sin^2\theta_0}
+\]
+
+\begin{result}
+\[
+\ddot u = u-1
+\]
+\end{result}
+This nondimensional equation holds for any $\theta_0$; only the scalings $T$ and $L$ depend on it. At $\theta_0=60^\circ$ ($\sin^2\theta_0=3/4$, $\cos\theta_0=1/2$):
+\[
+L\Big|_{\theta_0=60^\circ}=\frac{\frac12g}{\Omega^2\cdot\frac34}=\frac23\frac{g}{\Omega^2}
+\]
+
+\subsection*{(c) Phase portrait of the non-dimensionalized system}
+
+Let $v=u'$:
+\[
+u'=v, \qquad v'=u-1
+\]
+Equilibrium: $(u,v)=(1,0)$.
+\[
+J=\begin{bmatrix}0&1\\1&0\end{bmatrix}, \qquad \tau=0, \qquad \Delta=-1 \qquad\Longrightarrow\qquad \textbf{saddle point}
+\]
+\[
+\lambda=\pm1
+\]
+Eigendirections through the saddle: $v=u-1$ (unstable, $\lambda=+1$) and $v=-(u-1)$ (stable, $\lambda=-1$).
+
+Conserved quantity: since $v\,dv=(u-1)\,du$,
+\[
+\frac12v^2-\frac12(u-1)^2=h=\text{const}
+\]
+
+\begin{result}
+Since $u=r/L\ge0$ physically, only the half-plane $u\ge0$ of this phase portrait is physically relevant.
+\end{result}
+
+\PhasePortrait{Figures/Phase Portraits/Problem2c.png}{Phase portrait of the non-dimensionalized rotating-bead system: saddle at $(1,0)$, physically relevant region $u\ge0$ only.}{fig:p2c}
+
+\subsection*{(d) Minimum initial inward speed}
+
+Given $r_0=\dfrac{4g}{3\Omega^2}=Lu_0$ and $L=\dfrac23\dfrac{g}{\Omega^2}$:
+\[
+u_0=2
+\]
+
+\paragraph{The Hamiltonian.} The problem asks specifically for the Hamiltonian (the Legendre transform, not simply $T+V$), since the constraint driving the tube is rheonomic. With one generalized coordinate $x$:
+\[
+H=\dot x\,\frac{\partial L}{\partial\dot x}-L
+=\dot x(M\dot x)-\left(\frac12M\dot x^2+\frac12M\Omega^2x^2\sin^2\theta_0-Mgx\cos\theta_0\right)
+\]
+\[
+H=\underbrace{\frac12M\dot x^2}_{T_2}-\underbrace{\frac12M\Omega^2x^2\sin^2\theta_0}_{T_0}+\underbrace{Mgx\cos\theta_0}_{V} \;\neq\; E=T+V,
+\]
+since the velocity-independent piece of the kinetic energy, $T_0$, enters $H$ with a minus sign instead of a plus. $H$ is conserved because $\partial L/\partial t=0$ ($\Omega,\theta_0$ are constants, so $L$ has no explicit time dependence). The constraint here is rheonomic, but conservation survives it for this system specifically: the drive is axisymmetric, entering $L$ only through the constant $\Omega$ and never through $t$ directly.
+
+Nondimensionalizing with $x=Lu$, $\dot x=(L/T)v$ and the scalings $\Omega^2\sin^2\theta_0=1/T^2$, $Mg\cos\theta_0=ML/T^2$ from (b):
+\[
+H=\frac{ML^2}{T^2}\left(\frac12v^2-\frac12u^2+u\right)=\frac{ML^2}{T^2}\left[\underbrace{\frac12v^2-\frac12(u-1)^2}_{h}+\frac12\right]
+\]
+So, up to the positive overall scale $ML^2/T^2$ and an additive constant $\tfrac12$, $H$ reduces to exactly the conserved quantity $h=\frac12v^2-\frac12(u-1)^2$ found in (c) by integrating $v\,dv=(u-1)\,du$ --- confirming that quantity is (proportional to, up to offset) the Hamiltonian. At the saddle $(1,0)$, $h=0$; this is also the value of $h$ everywhere on the stable/unstable manifolds $v=\mp(u-1)$.
+
+\paragraph{Finding the threshold.} At $u_0=2$: $h=\frac12v_0^2-\frac12$. The level curves of $h$ are hyperbolas; only the branch with $h>0$ actually connects the far side $u_0=2$ down through the saddle region to $u=0$ with nonzero speed the whole way. At exactly $h=0$ the bead is riding the stable manifold itself: it asymptotes to $(u,v)\to(1,0)$ as $\varsigma\to\infty$ and never actually reaches $u=1$, let alone $u=0$. So the requirement is the strict inequality
+\[
+h>0 \qquad\Longrightarrow\qquad v_0^2-1>0 \qquad\Longrightarrow\qquad v_0<-1 \ \ (\text{inward branch}).
+\]
+Consequently $v_0=-1$ is not itself an attainable initial speed --- it is the infimum of the inward speeds that work, approached but never reached, since at $|v_0|=1$ the bead only creeps toward $r=L$ and never gets to the bottom of the tube.
+
+\[
+\frac{L}{T}=\frac{g\cos\theta_0/(\Omega^2\sin^2\theta_0)}{1/(\Omega\sin\theta_0)}=\frac{g}{\Omega\tan\theta_0}
+\qquad\Longrightarrow\qquad
+\dot x_0=\frac{L}{T}v_0=-\frac{g}{\Omega\tan\theta_0}
+\]
+
+\begin{result}
+The greatest lower bound on the inward speed (an infimum, not an attained minimum) is
+\[
+\dot x_0=-\frac{g}{\Omega\tan\theta_0}=-\frac{g}{\sqrt3\,\Omega} \qquad (\theta_0=60^\circ)
+\]
+\end{result}
+
 
 % ====================================================
-% PROBLEM 4
+% PROBLEM 3
 % ====================================================
 \newpage
 \section*{Problem 3}
@@ -121,6 +361,169 @@
     \centering
     \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 3.png}
 \end{figure}
+
+\subsection*{(a) Equation of motion}
+
+With $m=1$, $k=1$:
+\[
+\ddot x=-x+\mu(1-x^2)\dot x
+\]
+
+\subsection*{(b) State space}
+
+\[
+\dot x=v, \qquad \dot v=-x+\mu(1-x^2)v
+\]
+
+\subsection*{(c) $\mu=-1$}
+
+\[
+\dot x=v, \qquad \dot v=-x-v(1-x^2)
+\]
+Fixed point: $(0,0)$.
+
+Under time reversal $t\to-t$ (so $\dot x\to-\dot x$ while $x,\ddot x$ are unchanged), the equation $\ddot x=-x+\mu(1-x^2)\dot x$ maps into itself with $\mu\to-\mu$: the $\mu=-1$ system is the exact time-reversal of the $\mu=1$ system studied in (f)--(g). Part (g) finds that $\mu=1$ is the standard Van der Pol oscillator, with an unstable origin (confirmed by eigenvalues in (f)) surrounded by a stable limit cycle of amplitude $\approx2$. Time-reversing swaps the stability of \emph{both} features at once, so for $\mu=-1$ the origin is a locally stable spiral (confirmed by the eigenvalues in (e)) surrounded by an \textbf{unstable} limit cycle of the same amplitude, $\approx2.01$ numerically. The origin's basin of attraction is only the interior of this unstable cycle --- initial conditions outside it escape to infinity in finite time rather than spiraling in, which is why the figure below only seeds trajectories inside the cycle and draws the cycle itself by integrating backward in time from near the origin.
+
+\PhasePortrait{Figures/Phase Portraits/Problem3c.png}{Phase portrait for Problem 3(c): $\mu=-1$. The origin is only \emph{locally} stable: its basin is bounded by an unstable limit cycle at amplitude $\approx2.01$.}{fig:p3c}
+
+\subsection*{(d) Jacobian}
+
+With $f_1=v$ and $f_2=-x+\mu(1-x^2)v$:
+\[
+\frac{\partial f_2}{\partial x}=-1-2\mu xv, \qquad \frac{\partial f_2}{\partial v}=\mu(1-x^2)
+\]
+\[
+J=\begin{bmatrix}0&1\\-1-2\mu xv&\mu-\mu x^2\end{bmatrix}
+\]
+At $\mu=-1$: $J=\begin{bmatrix}0&1\\-1+2xv&-1+x^2\end{bmatrix}$, and at the equilibrium $(0,0)$:
+\[
+J\Big|_{(0,0)}=\begin{bmatrix}0&1\\-1&-1\end{bmatrix}, \qquad \tau=-1, \qquad \Delta=1
+\]
+
+\subsection*{(e) Eigenvalues for $\mu=-1$}
+
+\[
+\lambda=\frac{\tau\pm\sqrt{\tau^2-4\Delta}}{2}=\frac{-1\pm\sqrt{1-4}}{2}=-\frac12\pm\frac{\sqrt3}{2}i
+\]
+
+\begin{result}
+$\operatorname{Re}(\lambda)<0$ for both roots $\Rightarrow$ \textbf{stable spiral}. The equilibrium is stable for $\mu=-1$.
+\end{result}
+
+\subsection*{(f) Eigenvalues for $\mu=1$}
+
+\[
+J\Big|_{(0,0)}=\begin{bmatrix}0&1\\-1&1\end{bmatrix}, \qquad \tau=1, \qquad \Delta=1
+\]
+\[
+\lambda=\frac12\pm\frac{\sqrt3}{2}i
+\]
+
+\begin{result}
+$\operatorname{Re}(\lambda)>0$ for both roots $\Rightarrow$ \textbf{unstable spiral}. The equilibrium is no longer stable.
+\end{result}
+
+\subsection*{(g) Phase portrait for $\mu=1$}
+
+This system, $\ddot x-\mu(1-x^2)\dot x+x=0$, is the Van der Pol oscillator. Flipping the sign of $\mu$ reverses the sign of the effective damping near the origin: for $|x|<1$ the term $\mu(1-x^2)\dot x$ now pumps energy into the system instead of removing it, so the origin switches from a sink to a source. But since $t\to-t$ maps this system into the $\mu=-1$ system of (c), the change is more than just the origin flipping sign: \emph{both} the origin and the limit cycle flip stability together. At $\mu=-1$ the cycle is the unstable outer boundary of the origin's basin (part (c)); at $\mu=1$ that same cycle becomes stable, and it is now the origin that is unstable, with trajectories spiraling into the cycle from both inside and outside.
+
+This is also worth naming as a Hopf bifurcation in $\mu$, but a degenerate one, not the textbook supercritical case. At $\mu=0$ the system is simply $\ddot x+x=0$: a center, with a whole plane of neutrally stable periodic orbits at every amplitude, not an isolated equilibrium. In a generic supercritical Hopf bifurcation, the limit cycle is born at the bifurcation point with zero amplitude and grows continuously as $\sqrt{\mu}$; here instead the cycle amplitude stays $\approx2$ as $\mu\to0^+$ (and $\mu\to0^-$), rather than shrinking to zero at $\mu=0$.
+
+\PhasePortrait{Figures/Phase Portraits/Problem3g.png}{Phase portrait for Problem 3(g): $\mu=1$, the Van der Pol oscillator. The origin is now unstable, and the limit cycle (amplitude $\approx2$, the time-reversed image of the unstable cycle in Fig.~\ref{fig:p3c}) is stable, attracting trajectories from both inside and outside.}{fig:p3g}
+
+
+% ====================================================
+% PROBLEM 4
+% ====================================================
+\newpage
+\section*{Problem 4}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 4.png}
+\end{figure}
+
+\subsection*{(a) Non-dimensionalization}
+
+\[
+\frac{dV}{dy}=-Mg-k_1y+k_2y^3
+\qquad\Longrightarrow\qquad
+M\ddot y=-b\dot y-\frac{dV}{dy}=-b\dot y+Mg+k_1y-k_2y^3
+\]
+
+Let $y=Lx$, $t=T\varsigma$, so $\dfrac{d^2y}{dt^2}=\dfrac{L}{T^2}\ddot x$ and $\dfrac{dy}{dt}=\dfrac{L}{T}\dot x$:
+\[
+\frac{ML}{T^2}\ddot x=-\frac{bL}{T}\dot x+Mg+k_1Lx-k_2L^3x^3
+\]
+\[
+\ddot x=-\frac{bT}{M}\dot x+\frac{gT^2}{L}+\frac{k_1T^2}{M}x-\frac{k_2L^2T^2}{M}x^3
+\]
+
+Choose $\dfrac{bT}{M}=1 \ \Rightarrow\ T=\dfrac{M}{b}$, then choose $\dfrac{k_2L^2T^2}{M}=1$:
+\[
+L^2=\frac{M}{k_2T^2}=\frac{Mb^2}{k_2M^2}=\frac{b^2}{k_2M} \qquad\Longrightarrow\qquad L=\frac{b}{\sqrt{k_2M}}
+\]
+
+\[
+\ddot x+\dot x-\frac{k_1M}{b^2}x+x^3=\frac{g\sqrt{k_2}\,M^{5/2}}{b^3}
+\]
+
+\begin{result}
+\[
+a=\frac{k_1M}{b^2}, \qquad h=\frac{g\sqrt{k_2}\,M^{5/2}}{b^3}
+\]
+\end{result}
+
+\subsection*{(b) Phase portraits, $h=0.01$}
+
+\PhasePortrait{Figures/Phase Portraits/Problem4b-am1.png}{Phase portrait for Problem 4(b): $h=0.01$, $a=-1$.}{fig:p4b-am1}
+
+\PhasePortrait{Figures/Phase Portraits/Problem4b-ap1.png}{Phase portrait for Problem 4(b): $h=0.01$, $a=1$.}{fig:p4b-ap1}
+
+For $a=-1$, the equilibrium cubic $x^3+x-h=0$ is monotonic ($3x^2+1>0$ everywhere), so there is exactly one real equilibrium (near $x\approx0.01$), and the flow settles into it as a single stable spiral. For $a=1$, the cubic $x^3-x-h=0$ picks up three real roots, near $x\approx-0.995,\,-0.010,\,1.005$ for $h=0.01$: the small asymmetry $h$ breaks the perfect symmetry of the pitchfork, unequally shifting the two flanking equilibria and offsetting the middle root away from exactly zero. The two outer equilibria are stable spirals and the middle one is a saddle (see part (d)).
+
+\subsection*{(c) State-space equilibria}
+
+\[
+\dot x=v, \qquad \dot v=-v+ax-x^3+h
+\]
+Fixed points require $v^*=0$, which leaves:
+
+\begin{result}
+\[
+x^{*3}-ax^*-h=0
+\]
+\end{result}
+
+\subsection*{(d) Jacobian}
+
+\[
+J=\begin{bmatrix}0&1\\a-3x^2&-1\end{bmatrix}
+\]
+
+\begin{result}
+The trace $\tau=\operatorname{tr}J=-1$ for \emph{every} equilibrium, independent of $a$, $h$, or $x^*$. So no equilibrium of this system can turn unstable through a sign change in the trace: instability can only arise through $\Delta=\det J=3x^{*2}-a<0$, i.e.\ a saddle.
+\end{result}
+
+\subsection*{(e) Root-scatter plot over $a\in[-1,1]$, $h=0.01$}
+
+For each $a$ in the range, the real roots of $x^{*3}-ax^*-h=0$ (via a polynomial root solver) are the equilibria; each is classified by $\Delta=3x^{*2}-a$: $\Delta<0$ is a saddle (unstable), $\Delta>0$ is stable (a spiral whenever $\tau^2-4\Delta=1-4\Delta<0$, i.e.\ $\Delta>1/4$).
+
+\PhasePortrait{Figures/Phase Portraits/Problem4e-roots.png}{Equilibria $x^*$ vs.\ $a$ for $h=0.01$, colored by stability. The fold at $a_c\approx0.0877$, $x^*_c\approx-0.171$ is marked where the saddle and lower stable branches are born.}{fig:p4e}
+
+Because $h=0.01\neq0$ breaks the exact symmetry of the pitchfork, the branch structure is not the clean $x^*=0$ and $x^*=\pm\sqrt a$ curves of the ideal case. But the surviving branch at $a<0$ was never going to meet the saddle branch at one point: it continues smoothly through $a=0$ onto the upper $x^*\to+1$ branch and never bifurcates at all. What actually happens instead is a \textbf{saddle-node (fold) bifurcation}: the saddle and the lower stable branch are born together, out of nothing, at the point where the cubic $x^{*3}-ax^*-h=0$ becomes tangent to the $x^*$-axis, i.e.\ exactly where $\Delta=3x^{*2}-a=0$ as well. Solving $3x^{*2}=a$ for $x^*=-\sqrt{a/3}$ (the branch consistent with the plot) and substituting into the cubic eliminates $x^*$:
+\[
+x^{*3}-ax^*-h=0 \ \Longrightarrow\ x^*\left(\frac a3-a\right)=h \ \Longrightarrow\ x^*\left(-\frac{2a}{3}\right)=h
+\]
+Substituting $x^*=-\sqrt{a/3}$:
+\[
+-\sqrt{\frac a3}\left(-\frac{2a}{3}\right)=h \ \Longrightarrow\ \frac{2a}{3}\sqrt{\frac a3}=h,
+\]
+which for $h=0.01$ gives
+\[
+a_c\approx0.0877, \qquad x^*_c=-\sqrt{a_c/3}\approx-0.171,
+\]
+exactly where the two new branches appear in the scatter plot above. Physically, recall $a=k_1M/b^2$, so $a>0\Leftrightarrow k_1>0$ is a repelling spring: below $a_c$ that repelling term is too weak to create any equilibria beyond the one branch continuing from $a<0$; only above $a_c$ is it strong enough to carve out the saddle-node pair.
 
 
 % ====================================================
@@ -131,6 +534,15 @@
 \section*{Appendix: Code Listings}
 
 \subsection*{Problem 1 Code}
-\CodeListing{../code/Problem1.py}{INSERT .}{lst:p3}
+\CodeListing{../code/Problem1.py}{Problem 1 Phase Portraits}{lst:p1}
+
+\subsection*{Problem 2 Code}
+\CodeListing{../code/Problem2.py}{Problem 2 Phase Portrait}{lst:p2}
+
+\subsection*{Problem 3 Code}
+\CodeListing{../code/Problem3.py}{Problem 3 Phase Portraits}{lst:p3}
+
+\subsection*{Problem 4 Code}
+\CodeListing{../code/Problem4.py}{Problem 4 Phase Portraits and Root Scatter Plot}{lst:p4}
 
 \end{document}
