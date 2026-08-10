@@ -313,17 +313,203 @@ Chaining flight $\to$ touchdown $\to$ stance $\to$ liftoff $\to$ flight
 once defines a map from one apex state to the next,
 $P:(y_{n},v_{x,n})\mapsto(y_{n+1},v_{x,n+1})$, whose fixed points
 correspond to steady periodic hopping and whose local stability is
-governed by the eigenvalues of the linearized (Jacobian) map about
-that fixed point.
+governed by the linearization of $P$ about that fixed point. Section
+2.7 shows that this apparently two-dimensional map is in fact governed
+by a single scalar, so that linearization turns out to be one
+derivative, not a Jacobian's worth of eigenvalues.
 
-\begin{insertBox}{Liftoff-to-flight map and apex return map derivation}
-Derive the liftoff analogue of the touchdown map above (stance polar
-state $\to$ Cartesian $\dot x_{LO},\dot y_{LO}$, then propagate to the
-next apex to get $y_{n+1}$, $v_{x,n+1}$), define the apex return map
-$P$ explicitly as a function of $(k,\theta_{TD})$, and state the fixed
-point condition $P(y^\ast,v_x^\ast)=(y^\ast,v_x^\ast)$ used for the
-stability analysis in Section~\ref{sec:results}.
-\end{insertBox}
+Liftoff occurs at $r=r_0$ (the switching condition of
+Section~2.3), so the liftoff state is
+$(r_0,\theta_{LO},\dot r_{LO},\dot\theta_{LO})$. Position converts back
+to Cartesian with the same relation used throughout stance,
+$\vec r_m=r\hat e_r$ (Section~2.3), evaluated at $r=r_0$,
+$\theta=\theta_{LO}$:
+\[
+    x_{LO}=r_0\cos\theta_{LO}, \qquad y_{LO}=r_0\sin\theta_{LO}
+\]
+Velocity converts by substituting $\hat e_r=\cos\theta\,\hat n_1+\sin\theta\,\hat n_2$,
+$\hat e_\theta=-\sin\theta\,\hat n_1+\cos\theta\,\hat n_2$ (Section~2.2)
+into $\vec v_m=\dot r\hat e_r+r\dot\theta\hat e_\theta$ (Section~2.3):
+\[
+    \vec v_m = \dot r\big(\cos\theta\,\hat n_1+\sin\theta\,\hat n_2\big)
+    +r\dot\theta\big(-\sin\theta\,\hat n_1+\cos\theta\,\hat n_2\big)
+    = \big(\dot r\cos\theta-r\dot\theta\sin\theta\big)\hat n_1
+    +\big(\dot r\sin\theta+r\dot\theta\cos\theta\big)\hat n_2
+\]
+evaluated at liftoff ($r=r_0$, $\theta=\theta_{LO}$, $\dot r=\dot r_{LO}$,
+$\dot\theta=\dot\theta_{LO}$):
+\begin{result}
+\[
+    \dot x_{LO}=\dot r_{LO}\cos\theta_{LO}-r_0\dot\theta_{LO}\sin\theta_{LO},
+    \qquad
+    \dot y_{LO}=\dot r_{LO}\sin\theta_{LO}+r_0\dot\theta_{LO}\cos\theta_{LO}
+\]
+\end{result}
+Note that this uses $\dot\theta_{LO}$, not just $\dot r_{LO}$: leg
+rotation rate contributes to Cartesian velocity just as much as leg
+extension rate does, through the $r\dot\theta\hat e_\theta$ term of
+$\vec v_m$.
+
+Once airborne, $r$ and $\theta$ have no physical meaning to condition
+on: they are polar coordinates about the planted foot, and there is no
+foot left to be ``about'' after liftoff releases it. Apex is instead
+defined purely in the ground frame, by $\dot y=0$. Flight has
+$\ddot y=-g$ (Section~2.1), so, starting the clock at liftoff,
+\[
+    \dot y(t) = \dot y_{LO}-gt
+\]
+Setting $\dot y(t_{apex})=0$:
+\begin{result}
+\[
+    t_{apex} = \frac{\dot y_{LO}}{g}
+\]
+\end{result}
+This is linear in $t$ because it is a condition on velocity, one
+integration of the constant $-g$ away from $t=0$. Touchdown
+(Section~2.2) instead solves a condition on position,
+$y(t_{TD})=y_{TD}$, and $y(t)=y_0-\tfrac g2t^2$ is quadratic in $t$
+(two integrations of $-g$) -- which is why that closed form needed a
+square root and this one does not.
+
+Propagating $x,y,\dot x,\dot y$ forward from liftoff using the flight
+solution of Section~2.1, $x(t)=\dot x_{LO}t+x_{LO}$,
+$y(t)=y_{LO}+\dot y_{LO}t-\tfrac g2t^2$, $\dot x(t)=\dot x_{LO}$,
+$\dot y(t)=\dot y_{LO}-gt$, at $t=t_{apex}=\dot y_{LO}/g$:
+\begin{result}
+\[
+    x_{n+1} = x_{LO}+\dot x_{LO}\,t_{apex}, \qquad
+    y_{n+1} = y_{LO}+\dot y_{LO}\,t_{apex}-\frac g2t_{apex}^2, \qquad
+    v_{x,n+1}=\dot x_{LO}, \qquad
+    \dot y_{n+1}=0
+\]
+\end{result}
+$v_{x,n+1}=\dot x_{LO}$ exactly, since horizontal motion is unforced in
+flight ($\ddot x=0$, Section~2.1); $\dot y_{n+1}=0$ exactly, by
+construction of $t_{apex}$, not approximately.
+
+The returned apex state $(x_{n+1},y_{n+1},v_{x,n+1},\dot y_{n+1})$ is
+expressed in Cartesian coordinates, not polar. This is a deliberate
+representational choice, not an oversight: polar $(r,\theta)$ was only
+ever meaningful about the specific planted foot of the stance phase
+just finished, and once airborne there is no foot location left for
+the next flight segment to be polar about. ($x_{LO}$ above is likewise
+expressed relative to that same foot rather than to some fixed ground
+origin; Section~2.7 shows this choice of origin cannot matter, since
+$x$ never enters the dynamics of either phase.)
+
+\subsection{Conserved Energy at Apex and Across a Full Hop Cycle}
+The flight-phase Lagrangian (Section~2.1) has $\vec r_m=x\hat n_1+y\hat
+n_2$ scleronomic and $T=\tfrac12m(\dot x^2+\dot y^2)$ homogeneous
+quadratic in $(\dot x,\dot y)$, with no explicit $t$-dependence -- the
+same structural conditions used in Section~2.4 for stance. By the
+identical argument, $H=T+V$ is conserved through flight:
+\[
+    E = \frac12m(\dot x^2+\dot y^2)+mgy = \text{const.}
+\]
+with no spring term, since the leg carries no elastic potential energy
+while airborne (unloaded, uncompressed). This is the apex-state energy
+functional. It differs from the stance-phase functional of
+Section~2.4,
+\[
+    E_{stance}=\frac12m(\dot r^2+r^2\dot\theta^2)+mgr\sin\theta
+    +\frac12k(r-r_0)^2,
+\]
+by the missing $\frac12k(r-r_0)^2$ term. The two functionals coincide
+exactly at touchdown and at liftoff, because both switching events
+occur at $r=r_0$ (Sections~2.2, 2.3), where the spring term vanishes
+identically, $\frac12k(r_0-r_0)^2=0$. Total mechanical energy is
+therefore continuous across every touchdown and liftoff transition,
+and, since it is separately conserved within each phase, it is
+conserved across an entire cycle apex $\to$ touchdown $\to$ stance
+$\to$ liftoff $\to$ apex. Section~4.2 validates this numerically.
+
+\subsection{Dimension Reduction of the Apex State}
+At apex, $\dot y=0$ by definition (Section~2.5). Substituting into the
+apex energy functional of Section~2.6:
+\[
+    E = \frac12m\dot x^2+mgy
+\]
+Solving for $\dot x$:
+\[
+    E-mgy = \frac12m\dot x^2 \quad\Longrightarrow\quad
+    \dot x^2 = \frac{2(E-mgy)}{m} = \frac{2E}{m}-2gy
+\]
+\begin{result}
+\[
+    \dot x = \sqrt{\frac{2E}{m}-2gy} \qquad (\dot x>0\text{ for forward hopping})
+\]
+\end{result}
+The apex state $(x,y,\dot x,\dot y)$ is therefore not four independent
+numbers. $\dot y=0$ identically at every apex, by definition. $x$
+never appears in any potential or force in either phase
+(Sections~2.1, 2.3): it is an ignorable coordinate, free to translate
+rigidly from hop to hop without feeding back into $\dot x$, $y$, or
+$\dot y$ -- which is exactly why Section~2.5 was free to express
+$x_{LO}$ relative to the current stance foot rather than to a fixed
+ground origin. And $\dot x$ is not independently free: once $E$ is
+fixed, it is determined by $y$ through the relation above. So at fixed
+$E$, the entire apex state collapses to the single scalar $y$, and the
+hop-to-hop dynamics reduce to a one-dimensional map,
+\[
+    y_{n+1} = P(y_n)
+\]
+where $P$ is the composition: reconstruct the full apex state from
+$y_n$ via $\dot x_n=\sqrt{2E/m-2gy_n}$ (this section) $\to$ flight to
+touchdown (Section~2.2) $\to$ stance integration to liftoff
+(Section~2.3) $\to$ flight to the next apex (Section~2.5).
+
+This reduction was checked numerically, not just asserted
+algebraically: the closed-form $\dot x$ above, evaluated at the
+\textit{output} apex height $y_{n+1}$ produced by simulating one full
+hop, was compared against the $\dot x_{n+1}$ that hop actually
+produced. Section~4.2 reports the result: the two agree to
+machine precision.
+
+\subsection{The Apex Return Map: Fixed Point and Stability Criterion}
+\label{sec:apexmapdef}
+With the reduction of Section~2.7, define the apex return map $P$ at
+fixed leg stiffness $k$ and fixed touchdown angle $\theta_{TD}$, with
+total energy $E$ also held fixed:
+\[
+    P: y_n \mapsto y_{n+1}
+\]
+$E$, $k$, and $\theta_{TD}$ play different roles. $E$ characterizes
+how fast, or how energetic, a given running gait is -- a property of
+the apex state a gait starts from (Section~2.6), not something swept.
+$k$ and $\theta_{TD}$ are the only two free parameters of the model
+itself (Section~2.3): there is no controller anywhere in this system,
+so a periodic gait at a given $E$ is whatever $P$ happens to produce
+for a chosen $(k,\theta_{TD})$, not something steered toward stability.
+
+A periodic (self-repeating) gait is a fixed point of $P$: a height
+$y^\ast$ such that
+\[
+    P(y^\ast) = y^\ast
+\]
+equivalently, a root of
+\[
+    f(y) = P(y)-y
+\]
+Local stability of $y^\ast$ is governed by the derivative of $P$ at
+the fixed point, $P'(y^\ast)$, estimated by a central finite
+difference:
+\[
+    P'(y^\ast) \approx \frac{P(y^\ast+dy)-P(y^\ast-dy)}{2\,dy}
+\]
+\[
+    |P'(y^\ast)|<1: \text{ stable (perturbations shrink hop over hop)}
+\]
+\[
+    |P'(y^\ast)|>1: \text{ unstable (perturbations grow)}
+\]
+The sign of $P'(y^\ast)$ carries meaning beyond the magnitude:
+$P'(y^\ast)<0$ means a perturbation's sign flips every hop --
+oscillatory divergence or convergence, alternating above and below
+$y^\ast$ -- while $P'(y^\ast)>0$ means a perturbation's sign is
+preserved every hop -- monotonic divergence or convergence, drifting
+away from or toward $y^\ast$ on one side. Section~4.3 reports the
+root-finding methodology and the result for the validated parameter
+set of Section~4.1.
 
 % ====================================================
 % 3. DISCUSSION OF ASSUMPTIONS
@@ -437,24 +623,129 @@ length, angle, CoM trajectory, and energy drift for this run.
     \label{fig:stance}
 \end{figure}
 
-\subsection{Apex Return Map, Phase Space, and Parameter Sweep}
-\begin{insertBox}{Multi-hop simulation and apex return map results}
-Once Section~\ref{sec:returnmap}'s liftoff/return map is implemented,
-populate this subsection with:
+\subsection{Full-Cycle Energy Conservation and Dimension-Reduction Validation}
+Beyond the single-stance check of Section~4.1,
+\texttt{proveX\_dotIsRedundant()} validates the full hop cycle. Starting from the apex
+state of Section~4.1 ($y_0=1.2$ m, $v_{x0}=3.0$ m/s), it computes the
+apex energy $E_1$ from the functional of Section~2.6
+(\texttt{energyHop()}), chains one entire hop -- flight $\to$
+touchdown $\to$ stance $\to$ liftoff $\to$ flight (\texttt{hop()}) --
+to the next apex, and recomputes the apex energy $E_2$ there. Relative
+drift over the full cycle is
+\[
+    \frac{|E_2-E_1|}{|E_1|} = 6.17\times10^{-13}
+\]
+consistent with the stance-phase-only drift of Section~4.1
+($6.46\times10^{-13}$), and confirming that total mechanical energy --
+not just the stance-phase quantity of Section~2.4 -- is conserved
+across the full switching cycle.
+
+The same run cross-checks the dimension reduction of Section~2.7. With
+$E_1$ fixed, the closed-form $\dot x=\sqrt{2E_1/m-2gy}$ is evaluated
+at the simulated output apex height, $y_{n+1}=1.4465$ m, predicting
+$\dot x_{pred}=2.0403$ m/s; the simulation's own output horizontal
+velocity at that apex is $v_{x,n+1}=2.0403$ m/s. Relative difference:
+\[
+    \frac{|v_{x,n+1}-\dot x_{pred}|}{|\dot x_{pred}|} = 2.41\times10^{-12}
+\]
+i.e.\ the algebraic reduction of Section~2.7 is not only formally
+correct, it is numerically consistent with the simulator to machine
+precision.
+
+\subsection{Apex Return Map: Root-Finding Methodology and Result}
+\label{sec:apexmapresult}
+\texttt{findApexMapFixedPoint()} locates the root of $f(y)=P(y)-y$
+(Section~2.8) over the domain of $y$ that is physically valid for a
+given $(k,\theta_{TD})$ and $E$. The domain is bounded below by
+\[
+    y_{min} = r_0\sin\theta_{TD}
+\]
+the minimum apex height geometrically consistent with a touchdown at
+angle $\theta_{TD}$ (Section~2.2: the foot cannot be below ground at
+touchdown, so $y_{TD}=r_0\sin\theta_{TD}\le y_0$). It is bounded above
+by the height at which the closed-form $\dot x$ of Section~2.7 would
+require a negative value under the square root,
+\[
+    \frac{2E}{m}-2gy\ge0 \quad\Longrightarrow\quad y\le y_{max}=\frac{E}{mg}
+\]
+At the exact lower boundary $y=y_{min}$, floating-point roundoff in
+the touchdown free-fall relation
+$\dot y_{TD}=-\sqrt{2g(y_0-r_0\sin\theta_{TD})}$ (Section~2.2) can push
+the argument of that square root slightly negative even though it is
+analytically exactly zero; a small inward padding,
+$y_{min}\to y_{min}+\epsilon$ ($\epsilon=10^{-3}$ m in the
+implementation), avoids this without altering the physics.
+
+$f(y)$ is sampled coarsely across $[y_{min},y_{max}]$ (30 samples in
+the implementation), and consecutive samples are checked for a sign
+change. Once a bracket $[y_i,y_{i+1}]$ with
+$\operatorname{sign}(f(y_i))\ne\operatorname{sign}(f(y_{i+1}))$ is
+found, Brent's method refines it to a root $y^\ast$. The derivative
+$P'(y^\ast)$ is then estimated by the central difference of
+Section~2.8 with $dy=10^{-3}$ m.
+
+For the validated parameter set of Section~4.1 ($m=80$ kg, $r_0=1$ m,
+$k=20000$ N/m, $\theta_{TD}=68^\circ$, with $E$ fixed by the apex
+state $y_0=1.2$ m, $v_{x0}=3.0$ m/s):
+\begin{result}
+\[
+    y^\ast \approx 1.5096\text{ m}, \qquad P'(y^\ast) \approx -2.76
+\]
+\end{result}
+$|P'(y^\ast)|>1$: this fixed point is unstable. The negative sign
+further indicates oscillatory divergence -- a perturbed apex height
+does not drift monotonically away from $y^\ast$, it overshoots on
+alternating sides of $y^\ast$, growing in magnitude each hop. This is
+a genuine finding of the analysis, not a discrepancy to be explained
+away: $\theta_{TD}=68^\circ$ was the value the project's working
+assumption had treated as the symmetric touchdown/liftoff angle, with
+an informal expectation that such a symmetric sweep would correspond
+to a stable periodic gait. It does not: at this $(k,\theta_{TD})$,
+steady hopping at $y^\ast\approx1.5096$ m is unstable.
+
+\subsection{Grid Sweep Methodology and Parameter Sweep}
+\texttt{gridSearchFixedPoints()} wraps the single-case pipeline of
+Section~4.3 into a function of $(k,\theta_{TD})$ that returns
+$(y^\ast,P'(y^\ast))$, or a null result if
+\texttt{findApexMapFixedPoint()} finds no sign change in $f(y)$ across
+the valid domain for that pair -- i.e.\ no periodic gait exists there
+at this $E$. Each grid cell is evaluated against its own deep copy of
+the base parameter dictionary, with only $k$ overwritten per cell, so
+sweeping $k$ across the grid never mutates the shared dictionary read
+by other cells or other stages of the pipeline.
+
+The grid itself is, for now, a coarse $5\times5$ sweep: $k$ from
+$5000$ to $40000$ N/m (soft to stiff) and $\theta_{TD}$ from
+$50^\circ$ to $80^\circ$, with each cell classified as stable
+($|P'(y^\ast)|<1$), unstable ($|P'(y^\ast)|>1$), or
+no-fixed-point-found. This coarse pass is intended to be refined near
+the stability boundary and visualized as a contour or pcolormesh
+figure over $(k,\theta_{TD})$, per the deliverable below. The
+physically motivated bounds under consideration for that refinement
+are a lower angle bound near $\theta_{TD}\approx59^\circ$ -- the
+friction-cone floor found separately (constraint-force analysis at
+$\mu=0.6$), below which the required ground-reaction force cannot be
+sustained without the foot slipping -- up through steep angles of
+attack, and a $k$ range wide enough to span qualitatively soft to
+stiff leg behavior.
+
+\begin{insertBox}{Parameter sweep results and figure}
+The single-case pipeline (Section~4.3) and the grid-sweep methodology
+above are implemented; what remains is populating this subsection with
+the actual sweep output:
 \begin{itemize}[leftmargin=1.4em]
-    \item A phase-space plot (e.g. $\dot\theta$ vs.\ $\theta$, or
-    successive apex heights $y_{n+1}$ vs.\ $y_n$) showing convergence
-    to a fixed point of the apex return map for at least one
-    stable $(k,\theta_{TD})$ combination.
-    \item A sweep over spring stiffness $k$ and touchdown angle
-    $\theta_{TD}$, reporting which combinations produce a stable
-    steady hopping gait (e.g.\ eigenvalues of the linearized return
-    map inside the unit circle) and which do not.
-    \item A short interpretation of the sweep: does stability match
-    the qualitative stiffness--speed trend reported by McMahon and
-    Cheng \cite{mcmahon1990}? Are there touchdown angles that fail
-    even though the single-stance dynamics are otherwise well
-    behaved?
+    \item An iteration plot (e.g.\ $y_{n+1}$ vs.\ $y_n$, or $y_n$ vs.\
+    hop index $n$) showing convergence to a fixed point for at least
+    one \textit{stable} $(k,\theta_{TD})$ combination -- Section~4.3
+    shows the $68^\circ$, $20000$ N/m case is unstable, so a stable
+    case must be located elsewhere in the grid first.
+    \item The refined $(k,\theta_{TD})$ grid itself: a contour or
+    pcolormesh of $P'(y^\ast)$, or a discrete
+    stable/unstable/no-fixed-point classification map.
+    \item A short interpretation: does stability match the
+    qualitative stiffness--speed trend reported by McMahon and Cheng
+    \cite{mcmahon1990}? Given Section~4.3's result, is
+    $\theta_{TD}=68^\circ$ representative of the grid, or an outlier?
 \end{itemize}
 \end{insertBox}
 

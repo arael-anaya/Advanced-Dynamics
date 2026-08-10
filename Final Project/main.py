@@ -209,7 +209,7 @@ def energyHop(apexState, params):
 # ============================================================
 
 def proveX_dotIsRedundant():
-    # E = (1/2)*m*(x_dot² + y_dot²) + m*g*y
+    # E = (1/2)*m*(x_dot^2 + y_dot^2) + m*g*y
     # ((E - mgy) * 2/m - y_dot**2))**.5 = x_dot
     # Y_dot = 0
     # ((E-mgy)*2/m)**.5 = x_dot
@@ -254,7 +254,7 @@ def findApexMapFixedPoint(params, thetaTD, y_o=y_o, v_o=v_o):
     f = lambda y: apexmap(y, thetaTD, params , E) - y
 
     y_min = params['r_o'] * np.sin(thetaTD) + .001 # apex must be at/above touchdown height for this thetaTD
-    # 2E/m - 2*g*y ≥ 0
+    # 2E/m - 2*g*y >= 0
     #  Y < 2E/ (2mg)
     y_max = 2*E / (2* params['m'] * params['g'])
 
