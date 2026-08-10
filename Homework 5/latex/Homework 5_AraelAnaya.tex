@@ -83,7 +83,7 @@
 \newcommand{\CodeListing}[3]{%
 \IfFileExists{#1}%
     {\lstinputlisting[style=pystyle,caption={#2},label={#3}]{#1}}%
-    {\begin{quote}\itshape Source file \texttt{#1} not found yet --- this
+    {\begin{quote}\itshape Source file \texttt{#1} not found yet; this
         listing will populate automatically once the file is written.\end{quote}}}
 
 % Phase-portrait figure: drops in automatically once the file exists at
@@ -95,7 +95,7 @@
     \IfFileExists{#2}%
         {\includegraphics[width=#1]{#2}}%
         {\fbox{\begin{minipage}[c][6cm][c]{0.65\linewidth}
-            \centering\itshape Phase portrait pending --- save figure to:\\
+            \centering\itshape Phase portrait pending. Save figure to:\\
             \texttt{\detokenize{#2}}
         \end{minipage}}}%
     \caption{#3}
@@ -174,13 +174,13 @@ Since $M,b,k>0$, $\tau<0$ always $\Rightarrow$ the equilibrium is always stable.
 \[
 \begin{aligned}
 b>2\sqrt{kM}&: \text{ overdamped, \textbf{stable node}} \\
-b=2\sqrt{kM}&: \text{ critically damped, \textbf{degenerate (improper) node} --- the boundary case} \\
+b=2\sqrt{kM}&: \text{ critically damped, \textbf{degenerate (improper) node} (the boundary case)} \\
 b<2\sqrt{kM}&: \text{ underdamped, \textbf{stable spiral}}
 \end{aligned}
 \]
 \end{result}
 
-At $b=b_{cr}=2\sqrt{kM}$ the discriminant $\tau^2-4\Delta$ vanishes and the two eigenvalues coalesce into the repeated root $\lambda=-b_{cr}/(2M)=-\sqrt{k/M}$: the two straight eigendirections of the overdamped node merge into one, and trajectories approach the origin tangent to that single direction without oscillating --- the fastest possible non-oscillatory decay, sitting exactly on the boundary between the node and the spiral.
+At $b=b_{cr}=2\sqrt{kM}$ the discriminant $\tau^2-4\Delta$ vanishes and the two eigenvalues coalesce into the repeated root $\lambda=-b_{cr}/(2M)=-\sqrt{k/M}$: the two straight eigendirections of the overdamped node merge into one, and trajectories approach the origin tangent to that single direction without oscillating: the fastest possible non-oscillatory decay, sitting exactly on the boundary between the node and the spiral.
 
 Eigenvector directions, from
 \[
@@ -205,7 +205,7 @@ M\ddot x=-kx+\mu N=-k\left(x-\frac{\mu N}{k}\right) \qquad\Longrightarrow\qquad 
 \]
 
 \begin{result}
-The system behaves like an undamped spring-mass oscillating about a fictitious center at $\mp\mu N/k$, depending on the sign of the velocity. In the phase plane the trajectory is a sequence of nested half-circles, alternating about the two centers $\pm\mu N/k$, that shrink by a constant amount each swing until the amplitude falls inside the ``dead band'' $|x|\le \mu N/k$ --- a whole line of fixed points, not an isolated one, since static friction can hold the mass anywhere in that range --- where the mass sticks and motion stops in finite time.
+The system behaves like an undamped spring-mass oscillating about a fictitious center at $\mp\mu N/k$, depending on the sign of the velocity. In the phase plane the trajectory is a sequence of nested half-circles, alternating about the two centers $\pm\mu N/k$, that shrink by a constant amount each swing until the amplitude falls inside the ``dead band'' $|x|\le \mu N/k$, a whole line of fixed points rather than an isolated one, since static friction can hold the mass anywhere in that range, where the mass sticks and motion stops in finite time.
 \end{result}
 
 \PhasePortrait{Figures/Phase Portraits/Problem1c.png}{Phase portrait for Problem 1(c): Coulomb friction.}{fig:p1c}
@@ -329,13 +329,13 @@ Nondimensionalizing with $x=Lu$, $\dot x=(L/T)v$ and the scalings $\Omega^2\sin^
 \[
 H=\frac{ML^2}{T^2}\left(\frac12v^2-\frac12u^2+u\right)=\frac{ML^2}{T^2}\left[\underbrace{\frac12v^2-\frac12(u-1)^2}_{h}+\frac12\right]
 \]
-So, up to the positive overall scale $ML^2/T^2$ and an additive constant $\tfrac12$, $H$ reduces to exactly the conserved quantity $h=\frac12v^2-\frac12(u-1)^2$ found in (c) by integrating $v\,dv=(u-1)\,du$ --- confirming that quantity is (proportional to, up to offset) the Hamiltonian. At the saddle $(1,0)$, $h=0$; this is also the value of $h$ everywhere on the stable/unstable manifolds $v=\mp(u-1)$.
+So, up to the positive overall scale $ML^2/T^2$ and an additive constant $\tfrac12$, $H$ reduces to exactly the conserved quantity $h=\frac12v^2-\frac12(u-1)^2$ found in (c) by integrating $v\,dv=(u-1)\,du$, confirming that quantity is (proportional to, up to offset) the Hamiltonian. At the saddle $(1,0)$, $h=0$; this is also the value of $h$ everywhere on the stable/unstable manifolds $v=\mp(u-1)$.
 
 \paragraph{Finding the threshold.} At $u_0=2$: $h=\frac12v_0^2-\frac12$. The level curves of $h$ are hyperbolas; only the branch with $h>0$ actually connects the far side $u_0=2$ down through the saddle region to $u=0$ with nonzero speed the whole way. At exactly $h=0$ the bead is riding the stable manifold itself: it asymptotes to $(u,v)\to(1,0)$ as $\varsigma\to\infty$ and never actually reaches $u=1$, let alone $u=0$. So the requirement is the strict inequality
 \[
 h>0 \qquad\Longrightarrow\qquad v_0^2-1>0 \qquad\Longrightarrow\qquad v_0<-1 \ \ (\text{inward branch}).
 \]
-Consequently $v_0=-1$ is not itself an attainable initial speed --- it is the infimum of the inward speeds that work, approached but never reached, since at $|v_0|=1$ the bead only creeps toward $r=L$ and never gets to the bottom of the tube.
+Consequently $v_0=-1$ is not itself an attainable initial speed: it is the infimum of the inward speeds that work, approached but never reached, since at $|v_0|=1$ the bead only creeps toward $r=L$ and never gets to the bottom of the tube.
 
 \[
 \frac{L}{T}=\frac{g\cos\theta_0/(\Omega^2\sin^2\theta_0)}{1/(\Omega\sin\theta_0)}=\frac{g}{\Omega\tan\theta_0}
@@ -382,7 +382,7 @@ With $m=1$, $k=1$:
 \]
 Fixed point: $(0,0)$.
 
-Under time reversal $t\to-t$ (so $\dot x\to-\dot x$ while $x,\ddot x$ are unchanged), the equation $\ddot x=-x+\mu(1-x^2)\dot x$ maps into itself with $\mu\to-\mu$: the $\mu=-1$ system is the exact time-reversal of the $\mu=1$ system studied in (f)--(g). Part (g) finds that $\mu=1$ is the standard Van der Pol oscillator, with an unstable origin (confirmed by eigenvalues in (f)) surrounded by a stable limit cycle of amplitude $\approx2$. Time-reversing swaps the stability of \emph{both} features at once, so for $\mu=-1$ the origin is a locally stable spiral (confirmed by the eigenvalues in (e)) surrounded by an \textbf{unstable} limit cycle of the same amplitude, $\approx2.01$ numerically. The origin's basin of attraction is only the interior of this unstable cycle --- initial conditions outside it escape to infinity in finite time rather than spiraling in, which is why the figure below only seeds trajectories inside the cycle and draws the cycle itself by integrating backward in time from near the origin.
+Under time reversal $t\to-t$ (so $\dot x\to-\dot x$ while $x,\ddot x$ are unchanged), the equation $\ddot x=-x+\mu(1-x^2)\dot x$ maps into itself with $\mu\to-\mu$: the $\mu=-1$ system is the exact time-reversal of the $\mu=1$ system studied in (f)--(g). Part (g) finds that $\mu=1$ is the standard Van der Pol oscillator, with an unstable origin (confirmed by eigenvalues in (f)) surrounded by a stable limit cycle of amplitude $\approx2$. Time-reversing swaps the stability of \emph{both} features at once, so for $\mu=-1$ the origin is a locally stable spiral (confirmed by the eigenvalues in (e)) surrounded by an \textbf{unstable} limit cycle of the same amplitude, $\approx2.01$ numerically. The origin's basin of attraction is only the interior of this unstable cycle: initial conditions outside it escape to infinity in finite time rather than spiraling in, which is why the figure below only seeds trajectories inside the cycle and draws the cycle itself by integrating backward in time from near the origin.
 
 \PhasePortrait{Figures/Phase Portraits/Problem3c.png}{Phase portrait for Problem 3(c): $\mu=-1$. The origin is only \emph{locally} stable: its basin is bounded by an unstable limit cycle at amplitude $\approx2.01$.}{fig:p3c}
 
