@@ -649,31 +649,120 @@ not an artifact of grid spacing.
     \label{fig:stability_refinement}
 \end{figure}
 
+\subsection{Apex-Map Iteration: Cobweb Diagrams for the Stable and Unstable Cases}
+\label{sec:cobweb}
+Section~\ref{sec:apexmapresult} and Section~4.4 each report a fixed point and
+a slope, but neither shows what convergence or divergence of the apex map
+actually looks like hop to hop. \texttt{plotApexMapIteration()} answers that
+directly by iterating $y_{n+1}=P(y_n)$ from a perturbed initial height and
+plotting both the cobweb diagram (the map $P(y)$, the diagonal
+$y_{n+1}=y_n$, and the resulting staircase) and $y_n$ vs.\ hop index $n$, for
+two cases at the same fixed energy $E$: the stable representative cell of
+Section~4.4 ($k\approx20114$ N/m, $\theta_{TD}\approx70.96^\circ$,
+$y^\ast\approx0.9496$ m, $P'(y^\ast)\approx0.35$) and the unstable validated
+point of Section~\ref{sec:apexmapresult} ($k=20000$ N/m, $\theta_{TD}=68^\circ$,
+$y^\ast\approx1.5096$ m, $P'(y^\ast)\approx-2.76$).
 
+Figure~\ref{fig:apex_iteration} confirms the qualitative prediction of
+Section~2.8 from the sign and magnitude of $P'(y^\ast)$ alone: perturbing the
+stable case by $+0.05$ m produces a monotonic staircase that steps down the
+same side of the diagonal every hop, converging smoothly onto $y^\ast$. That
+this monotonic decay only shows up for a \emph{small} perturbation is itself
+informative: the sweep only certifies \emph{local} stability, and a larger
+perturbation of the same stable fixed point instead wanders through the
+map's global nonlinearity (the hump shape of $P(y)$ visible in the figure)
+before it happens to land back near $y^\ast$, if it does at all. Perturbing
+the unstable case by only $+0.02$ m, by contrast, produces a staircase that
+immediately crosses to the other side of the diagonal every hop and spirals
+outward, consistent with the oscillatory divergence already reported
+qualitatively in Section~\ref{sec:apexmapresult}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Graphs/apex_map_iteration.png}
+    \caption{\footnotesize Apex-map cobweb iteration (top) and apex height
+    per hop (bottom) for the stable cell of Section~4.4 (left, green) and the
+    unstable point of Section~\ref{sec:apexmapresult} (right, orange). The
+    stable case converges monotonically for a small perturbation; the
+    unstable case diverges, alternating sides of $y^\ast$ each hop.}
+    \label{fig:apex_iteration}
+\end{figure}
+
+\subsection{Bifurcation Diagrams Along Each Sweep Direction}
+\label{sec:bifurcation}
+Section~4.4's grid already classifies every $(k,\theta_{TD})$ cell as
+stable/unstable/no-fixed-point, but a single 2-D classification map does not
+show \emph{how} the fixed point loses stability as a parameter is varied
+continuously. \texttt{plotBifurcationDiagrams()} slices two 1-D bifurcation
+diagrams directly out of that same grid -- no new integration, just a row
+and a column read back out -- both passing through the representative
+stable cell: $y^\ast$ and $P'(y^\ast)$ vs.\ $\theta_{TD}$ at fixed
+$k\approx20114$ N/m, and vs.\ $k$ at fixed $\theta_{TD}\approx70.96^\circ$
+(Figure~\ref{fig:bifurcation}).
+
+Both slices show the same structure: $y^\ast(\theta_{TD})$ and $y^\ast(k)$
+vary smoothly and almost linearly, with no branching or discontinuity in the
+fixed point itself, so this is not a classical saddle-node or pitchfork
+bifurcation in $y^\ast$. Instead the loss of stability lives entirely in
+$P'(y^\ast)$: it crosses $+1$ sharply at both edges of the narrow stable
+window (the thin green band already visible in Figure~\ref{fig:stability_sweep}),
+confirming that the self-stable region identified by the grid sweep is
+bounded by genuine $|P'(y^\ast)|=1$ crossings at both the $\theta_{TD}$ and
+$k$ edges of the band, not by a grid-resolution artifact.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Graphs/bifurcation_diagrams.png}
+    \caption{\footnotesize Bifurcation diagrams: fixed-point height
+    $y^\ast$ (top) and slope $P'(y^\ast)$ (bottom) vs.\ $\theta_{TD}$ at
+    fixed $k$ (left) and vs.\ $k$ at fixed $\theta_{TD}$ (right), sliced
+    through the representative stable cell of Section~4.4. Shaded band:
+    $|P'(y^\ast)|<1$ (stable). Marker shape doubles the stable/unstable
+    color coding.}
+    \label{fig:bifurcation}
+\end{figure}
+
+\subsection{Stance-Phase Portrait}
+\label{sec:phaseportrait}
+Section~1 motivates SLIP as building directly on the elastic pendulum studied
+in class. \texttt{stancePhasePortrait()} makes that connection concrete by
+plotting the stance-phase trajectory in the $(r,\dot r)$ and
+$(\theta,\dot\theta)$ phase planes for several touchdown angles at the same
+fixed apex energy (Figure~\ref{fig:phase_portrait}). Each trajectory is an
+open arc, not a closed orbit: stance is a single finite-time pass through
+phase space between the touchdown event (circle) and the liftoff event
+(square), not a free-running periodic oscillator -- $r=r_0$ at both
+switching events, but $\dot r$ changes sign in between as the leg compresses
+and rebounds. Steeper touchdown angles produce shorter, less compressed
+arcs that stay close to $r=r_0$ throughout, consistent with a more vertical
+landing imparting less leg compression, while shallower angles compress the
+leg further and sweep through a wider range of $\theta$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Graphs/stance_phase_portrait.png}
+    \caption{\footnotesize Stance-phase trajectories in the leg-length
+    $(r,\dot r)$ and leg-angle $(\theta,\dot\theta)$ phase planes across
+    touchdown angles $\theta_{TD}\in[60^\circ,77^\circ]$ at fixed apex
+    energy. Circle = touchdown, square = liftoffStateSwitch.}
+    \label{fig:phase_portrait}
+\end{figure}
 
 \begin{insertBox}{Discussion: interpretation of the sweep results}
-The sweep and its resolution check are done; what remains is the
-write-up:
+The sweep, its resolution check, and the iteration/bifurcation/phase-portrait
+figures above are all done; what remains is the interpretive write-up:
 \begin{itemize}[leftmargin=1.4em]
-    \item An iteration plot (e.g.\ $y_{n+1}$ vs.\ $y_n$, or $y_n$ vs.\
-    hop index $n$) showing convergence to a fixed point for a
-    \textit{stable} case -- the representative cell above
-    ($k\approx20114$ N/m, $\theta_{TD}\approx70.96^\circ$,
-    $y^\ast\approx0.9496$ m, $P'(y^\ast)\approx0.348$) is a ready-made
-    example, and since $P'(y^\ast)>0$ it should converge
-    \textit{monotonically}, in contrast to the oscillatory divergence
-    of Section~4.3's unstable case.
-    \item Interpretation: does the shape of the stable band (stiffness
-    rising with touchdown angle) match the qualitative
+    \item Does the shape of the stable band (stiffness rising with
+    touchdown angle, Figure~\ref{fig:bifurcation}) match the qualitative
     stiffness--speed trend reported by McMahon and Cheng
-    \cite{mcmahon1990}? Section~4.3's point ($68^\circ$, $20000$ N/m)
-    is unstable and sits just outside the band at that stiffness --
-    is that representative of the grid, or an outlier chosen before
-    the sweep existed? What does it mean physically that the
-    self-stable region is only a few cells wide even at full
-    resolution -- is steady hopping in this model fundamentally
-    fragile, or is this an artifact of holding $\theta_{TD}$ fixed
-    through flight (Section~3) with no swing-leg feedback?
+    \cite{mcmahon1990}? Section~\ref{sec:apexmapresult}'s point
+    ($68^\circ$, $20000$ N/m) is unstable and sits just outside the band at
+    that stiffness -- is that representative of the grid, or an outlier
+    chosen before the sweep existed? What does it mean physically that the
+    self-stable region is only a few cells wide even at full resolution --
+    is steady hopping in this model fundamentally fragile, or is this an
+    artifact of holding $\theta_{TD}$ fixed through flight (Section~3) with
+    no swing-leg feedback?
 \end{itemize}
 \end{insertBox}
 

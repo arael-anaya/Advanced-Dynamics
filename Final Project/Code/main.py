@@ -407,6 +407,198 @@ def stableBandWidth(slope_grid):
 
 
 # ============================================================
+# Stage 8 - Deliverable figures: apex-map iteration (cobweb),
+# bifurcation diagrams sliced from the (k, thetaTD) sweep, and
+# the stance-phase portrait. These answer the write-up's own
+# open questions about the sweep (Section 4.4's insert box):
+# what does convergence/divergence of the apex map actually look
+# like, and where exactly does the fixed point lose stability?
+# ============================================================
+
+def apexMapDomain(thetaTD, params, E):
+    """Same y-domain bounds used inside findApexMapFixedPoint(): apex height
+    must be at/above the touchdown height for this thetaTD, and low enough
+    that 2E/m - 2*g*y stays non-negative."""
+    y_min = params['r_o'] * np.sin(thetaTD) + 1e-3
+    y_max = E / (params['m'] * params['g'])
+    return y_min, y_max
+
+
+def iterateApexMap(y0, thetaTD, params, E, n_iter=10, domain=None):
+    """Iterates y_(n+1) = apexmap(y_n) starting from y0, stopping early if an
+    iterate leaves the physically valid domain -- a real possibility right
+    next to an unstable fixed point, where the map blows up in a few hops."""
+    y_min, y_max = domain if domain is not None else (-np.inf, np.inf)
+    ys = [y0]
+    for _ in range(n_iter):
+        y_prev = ys[-1]
+        if not (y_min < y_prev < y_max):
+            break
+        try:
+            y_next = apexmap(y_prev, thetaTD, params, E)
+        except Exception:
+            break
+        if not np.isfinite(y_next):
+            break
+        ys.append(y_next)
+    return np.array(ys)
+
+
+def _apexMapIterationPanel(ax_cobweb, ax_trace, thetaTD, params, E, y_star, slope,
+                            y0_offset, label, color, n_iter=10):
+    """One stable- or unstable-case pair: a cobweb diagram of P(y) with the
+    staircase iteration overlaid, plus the same iteration as y_n vs hop
+    index. Each panel is self-labeled (title + legend), so color here is
+    never the only channel identifying stable vs. unstable."""
+    y_min, y_max = apexMapDomain(thetaTD, params, E)
+    y_curve = np.linspace(y_min, y_max, 300)
+    P_curve = np.array([apexmap(y, thetaTD, params, E) for y in y_curve])
+
+    ax_cobweb.plot(y_curve, P_curve, color='#2a78d6', lw=1.5, label='$P(y)$')
+    ax_cobweb.plot(y_curve, y_curve, color='gray', ls='--', lw=1, label='$y_{n+1}=y_n$')
+    ax_cobweb.plot(y_star, y_star, marker='*', color='k', ms=12, zorder=5, label='$y^*$')
+
+    ys = iterateApexMap(y_star + y0_offset, thetaTD, params, E, n_iter=n_iter, domain=(y_min, y_max))
+    for n in range(len(ys) - 1):
+        ax_cobweb.plot([ys[n], ys[n]], [ys[n], ys[n + 1]], color=color, lw=1, alpha=0.85)
+        ax_cobweb.plot([ys[n], ys[n + 1]], [ys[n + 1], ys[n + 1]], color=color, lw=1, alpha=0.85)
+    ax_cobweb.plot(ys[0], ys[0], 'o', color=color, ms=6, label='$y_0$')
+    ax_cobweb.set_xlabel('$y_n$ [m]')
+    ax_cobweb.set_ylabel('$y_{n+1}$ [m]')
+    ax_cobweb.set_title(f"{label}\n$P'(y^*) = {slope:.2f}$")
+    ax_cobweb.legend(fontsize=7, loc='best')
+    ax_cobweb.grid(alpha=0.3)
+
+    ax_trace.plot(range(len(ys)), ys, 'o-', color=color)
+    ax_trace.axhline(y_star, color='k', ls='--', lw=0.8, label='$y^*$')
+    ax_trace.set_xlabel('hop index $n$')
+    ax_trace.set_ylabel('$y_n$ [m]')
+    ax_trace.set_title('Apex height per hop')
+    ax_trace.legend(fontsize=7)
+    ax_trace.grid(alpha=0.3)
+    return ys
+
+
+def plotApexMapIteration(stable_case, unstable_case, save_path=None):
+    """Side-by-side cobweb + iteration-trace figure contrasting the stable
+    fixed point (Section 4.4/4.5's representative cell) with the unstable
+    one (Section 4.3's validated parameter set) -- directly answers the
+    write-up's request for an iteration plot showing convergence."""
+    fig, axes = plt.subplots(2, 2, figsize=(11, 9))
+
+    _apexMapIterationPanel(axes[0, 0], axes[1, 0], color='#4c9a6a', **stable_case)
+    _apexMapIterationPanel(axes[0, 1], axes[1, 1], color='#e07b54', **unstable_case)
+
+    fig.suptitle('Apex return map: cobweb iteration and per-hop apex height')
+    fig.tight_layout()
+    if save_path:
+        fig.savefig(save_path, dpi=300)
+    return fig, axes
+
+
+def _bifurcationColumn(ax_top, ax_bot, x, y_star, slope, xlabel, title):
+    found = ~np.isnan(slope)
+    stable = found & (np.abs(slope) < 1)
+    unstable = found & (np.abs(slope) >= 1)
+
+    # Marker shape (o vs ^), not just color, distinguishes stable/unstable --
+    # this green/orange pair reads fine for normal vision but is a poor
+    # protanopia/deuteranopia pairing, so identity can't ride on hue alone.
+    ax_top.plot(x[stable], y_star[stable], 'o', color='#4c9a6a', ms=5, label='stable')
+    ax_top.plot(x[unstable], y_star[unstable], '^', color='#e07b54', ms=5, label='unstable')
+    ax_top.set_ylabel(r'$y^\ast$ [m]')
+    ax_top.set_title(title)
+    ax_top.legend(fontsize=8)
+    ax_top.grid(alpha=0.3)
+
+    ax_bot.plot(x[found], slope[found], color='#2a78d6', lw=1.2)
+    ax_bot.axhline(1, ls='--', color='k', lw=0.8)
+    ax_bot.axhline(-1, ls='--', color='k', lw=0.8)
+    ax_bot.axhspan(-1, 1, color='#4c9a6a', alpha=0.08)
+    ax_bot.set_xlabel(xlabel)
+    ax_bot.set_ylabel(r"$P'(y^\ast)$")
+    ax_bot.grid(alpha=0.3)
+
+
+def plotBifurcationDiagrams(k_values, thetaTD_deg_values, y_star_grid, slope_grid,
+                             i_fixed_k, j_fixed_theta, save_path=None):
+    """Two one-parameter bifurcation slices through the (k, thetaTD) sweep
+    grid, both through the same representative stable cell used for the
+    local refinement in Stage 7: y* (top) and P'(y*) (bottom) vs. thetaTD at
+    fixed k (left column), and vs. k at fixed thetaTD (right column). Where
+    the bottom row crosses +-1, the fixed point above loses stability -- a
+    bifurcation of the apex map."""
+    k_fixed_val = k_values[i_fixed_k]
+    theta_fixed_val = thetaTD_deg_values[j_fixed_theta]
+
+    fig, axes = plt.subplots(2, 2, figsize=(11, 8))
+
+    _bifurcationColumn(axes[0, 0], axes[1, 0], thetaTD_deg_values,
+                        y_star_grid[i_fixed_k, :], slope_grid[i_fixed_k, :],
+                        xlabel=r'$\theta_{TD}$ [deg]',
+                        title=f'Bifurcation vs $\\theta_{{TD}}$ (k={k_fixed_val:.0f} N/m)')
+    _bifurcationColumn(axes[0, 1], axes[1, 1], k_values,
+                        y_star_grid[:, j_fixed_theta], slope_grid[:, j_fixed_theta],
+                        xlabel='k [N/m]',
+                        title=f'Bifurcation vs k ($\\theta_{{TD}}$={theta_fixed_val:.2f}$^\\circ$)')
+
+    fig.suptitle('Loss of stability of the apex-map fixed point along each sweep direction')
+    fig.tight_layout()
+    if save_path:
+        fig.savefig(save_path, dpi=300)
+    return fig, axes
+
+
+def stancePhasePortrait(thetaTD_deg_list, y_o, v_o, params, save_path=None):
+    """Runs one stance phase per touchdown angle at fixed apex energy (same
+    y_o, v_o for all) and plots the resulting trajectories in the (r, r_dot)
+    and (theta, theta_dot) phase planes -- the SLIP-stance analogue of the
+    elastic-pendulum phase portraits from lecture. Circle = touchdown,
+    square = liftoffStateSwitch. thetaTD is a single-hue sequential
+    parameter here (not a category), so it gets a light->dark blue ramp
+    rather than a categorical palette."""
+    fig, axes = plt.subplots(1, 2, figsize=(11, 5))
+    cmap = plt.get_cmap('Blues')
+    n = len(thetaTD_deg_list)
+
+    for idx, theta_deg in enumerate(thetaTD_deg_list):
+        theta_rad = np.radians(theta_deg)
+        color = cmap(0.35 + 0.55 * idx / max(n - 1, 1))
+        s0 = touchdownState(v_o, y_o, theta_rad, params['r_o'], params['g'])
+        sol = solve_ivp(standingState, (0.0, 1.0), s0, args=(params,),
+                         events=liftoffStateSwitch, rtol=1e-10, atol=1e-12,
+                         dense_output=True, max_step=1e-3)
+        if sol.status != 1 or len(sol.t_events[0]) == 0:
+            continue
+        r, th, rdot, thdot = sol.y
+        axes[0].plot(r, rdot, color=color, lw=1.5, label=f'{theta_deg:.0f}$^\\circ$')
+        axes[0].plot(r[0], rdot[0], 'o', color=color, ms=5)
+        axes[0].plot(r[-1], rdot[-1], 's', color=color, ms=5)
+
+        axes[1].plot(np.degrees(th), thdot, color=color, lw=1.5)
+        axes[1].plot(np.degrees(th[0]), thdot[0], 'o', color=color, ms=5)
+        axes[1].plot(np.degrees(th[-1]), thdot[-1], 's', color=color, ms=5)
+
+    axes[0].axvline(params['r_o'], ls=':', color='gray', lw=0.8, label='$r_0$')
+    axes[0].set_xlabel('r [m]')
+    axes[0].set_ylabel(r'$\dot r$ [m/s]')
+    axes[0].set_title('Leg length phase plane')
+    axes[0].legend(title=r'$\theta_{TD}$', fontsize=7)
+    axes[0].grid(alpha=0.3)
+
+    axes[1].set_xlabel(r'$\theta$ [deg]')
+    axes[1].set_ylabel(r'$\dot\theta$ [rad/s]')
+    axes[1].set_title('Leg angle phase plane')
+    axes[1].grid(alpha=0.3)
+
+    fig.suptitle('Stance-phase portrait across touchdown angles (fixed apex energy)')
+    fig.tight_layout()
+    if save_path:
+        fig.savefig(save_path, dpi=300)
+    return fig, axes
+
+
+# ============================================================
 # Run
 # ============================================================
 
@@ -414,6 +606,11 @@ import os
 import warnings
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# All Stage 8 deliverable figures are saved directly into the latex source
+# tree so there is no manual copy step before compiling.
+GRAPH_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, '..', 'latex', 'Figures', 'Graphs'))
+os.makedirs(GRAPH_DIR, exist_ok=True)
 
 RESULTS_PATH = os.path.join(SCRIPT_DIR, "sweep_results.npz")
 RERUN_SWEEP = False  # set True to force a fresh sweep even if a cached file exists
@@ -502,3 +699,34 @@ if __name__ == "__main__":
         plotStabilitySweep(k_fine, theta_fine_deg, y_star_fine, slope_fine,
                             friction_floor_deg=59.0,
                             save_path=os.path.join(SCRIPT_DIR, 'stability_refinement.png'))
+
+        # ---- Stage 8: deliverable figures for the write-up ----
+        trial_stable_params = copy.deepcopy(params)
+        trial_stable_params['k'] = k_center
+        y_star_stable = y_star_grid[i, j]
+        slope_stable = slope_grid[i, j]
+
+        y_star_unstable, slope_unstable = findApexMapFixedPoint(params, thetaTD)
+        E_fixed = energyHop([0, y_o, v_o, 0], params)
+
+        stable_case = dict(
+            thetaTD=np.radians(theta_center_deg), params=trial_stable_params, E=E_fixed,
+            y_star=y_star_stable, slope=slope_stable, y0_offset=0.05,
+            label=f'Stable case ($k\\approx{k_center:.0f}$ N/m, '
+                  f'$\\theta_{{TD}}\\approx{theta_center_deg:.2f}^\\circ$)')
+        unstable_case = dict(
+            thetaTD=thetaTD, params=params, E=E_fixed,
+            y_star=y_star_unstable, slope=slope_unstable, y0_offset=0.02,
+            label=f'Unstable case ($k={params["k"]:.0f}$ N/m, '
+                  f'$\\theta_{{TD}}={np.degrees(thetaTD):.0f}^\\circ$)')
+
+        plotApexMapIteration(stable_case, unstable_case,
+                              save_path=os.path.join(GRAPH_DIR, 'apex_map_iteration.png'))
+
+        plotBifurcationDiagrams(k_sweep, thetaTD_sweep_deg, y_star_grid, slope_grid, i, j,
+                                 save_path=os.path.join(GRAPH_DIR, 'bifurcation_diagrams.png'))
+
+        stancePhasePortrait([60, 65, 68, 71, 74, 77], y_o, v_o, params,
+                             save_path=os.path.join(GRAPH_DIR, 'stance_phase_portrait.png'))
+
+        print(f"Stage 8 figures saved to {GRAPH_DIR}")
