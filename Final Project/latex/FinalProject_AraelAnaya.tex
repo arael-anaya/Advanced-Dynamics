@@ -681,30 +681,22 @@ write-up:
 % 5. LESSONS LEARNED
 % ====================================================
 \section{Lessons Learned}
-This project proved to be incredibly informative. It allowed me to dive into a multi-stage dynamic system and taught be
-how to address the state transition conditions in a clear and defined way.
+This project proved to be incredibly informative. It allowed me to dive into a multi-stage dynamic system and taught me
+how to address the state transition conditions in a clear and defined way. It also expanded upon our study of geometric
+dynamics analysis by requiring a different mechanism for the stability comparison. Instead of having to analyze the whole system,
+we only have to look at the points in space that best define our motion. This also drove home that finding a periodic
+solution is not the same as finding a stable one: the fixed point of the apex return map exists whether or not it is
+attracting, so stability has to be checked separately -- and for the validated parameters, it turned out the hopping
+gait was not stable at all.
 
-\begin{insertBox}{Lessons learned discussion}
-Address all three of the following once the project is complete:
-\begin{enumerate}[leftmargin=1.4em]
-    \item \textbf{Benefits and limitations of the chosen approach.}
-    What did the Lagrangian/generalized-coordinates + event-based
-    hybrid-integration approach make easy, and where did it break down
-    or require extra care (e.g.\ the touchdown/liftoff coordinate
-    conversions, or the accuracy demands of chaining many hops through
-    the return map)?
-    \item \textbf{What was learned by modeling this system.} E.g.\
-    anything surprising about the stance dynamics, the sensitivity of
-    the return map to $(k,\theta_{TD})$, or the practical challenges of
-    event-based integration that weren't obvious before doing this
-    project.
-    \item \textbf{Which course learning outcomes this project
-    demonstrates.} Connect explicitly back to specific MEGN505 learning
-    outcomes (Lagrangian mechanics, generalized coordinates,
-    constraints, stability of periodic motion via Poincar\'e maps,
-    numerical simulation of dynamical systems, etc.).
-\end{enumerate}
-\end{insertBox}
+It was also a great project for working through robotics-style problems. The inverted pendulum is a very famous model
+used throughout all of robotics. But with the Lagrangian, this derivation can become relatively simple, opening the
+door for more accurate models. Working through the parameter sweep taught me a practical lesson about trusting
+numerical results, too: the first coarse grid over $(k,\theta_{TD})$ turned up a stable band so thin it could have
+just been a grid-resolution artifact, and only after refining the grid and confirming the band held its width could
+I be confident that the narrow self-stable region was a real feature of the model rather than a numerical accident.
+
+
 
 % ====================================================
 % REFERENCES
