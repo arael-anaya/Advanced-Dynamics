@@ -466,7 +466,12 @@ def _apexMapIterationPanel(ax_cobweb, ax_trace, thetaTD, params, E, y_star, slop
     ax_cobweb.set_xlabel('$y_n$ [m]')
     ax_cobweb.set_ylabel('$y_{n+1}$ [m]')
     ax_cobweb.set_title(f"{label}\n$P'(y^*) = {slope:.2f}$")
-    ax_cobweb.legend(fontsize=7, loc='best')
+    # fontsize=7 in source units reads fine at native 3300x2700 resolution,
+    # but this figure is placed at 0.95\linewidth on a letter page -- a
+    # ~0.59x downscale that shrinks it to under 5pt on the printed/rendered
+    # page, below any legible threshold. Bumped to match the other panel
+    # text (default ~10pt) so it survives that downscale.
+    ax_cobweb.legend(fontsize=10, loc='best')
     ax_cobweb.grid(alpha=0.3)
 
     ax_trace.plot(range(len(ys)), ys, 'o-', color=color)
@@ -474,7 +479,7 @@ def _apexMapIterationPanel(ax_cobweb, ax_trace, thetaTD, params, E, y_star, slop
     ax_trace.set_xlabel('hop index $n$')
     ax_trace.set_ylabel('$y_n$ [m]')
     ax_trace.set_title('Apex height per hop')
-    ax_trace.legend(fontsize=7)
+    ax_trace.legend(fontsize=10)
     ax_trace.grid(alpha=0.3)
     return ys
 
