@@ -653,7 +653,7 @@ not an artifact of grid spacing.
 \label{sec:cobweb}
 Section~\ref{sec:apexmapresult} and Section~4.4 each report a fixed point and
 a slope, but neither shows what convergence or divergence of the apex map
-actually looks like hop to hop. \texttt{plotApexMapIteration()} answers that
+actually looks like hop to hop. \texttt{plotApexMapIteration()} does that
 directly by iterating $y_{n+1}=P(y_n)$ from a perturbed initial height and
 plotting both the cobweb diagram (the map $P(y)$, the diagonal
 $y_{n+1}=y_n$, and the resulting staircase) and $y_n$ vs.\ hop index $n$, for
@@ -694,8 +694,7 @@ Section~4.4's grid already classifies every $(k,\theta_{TD})$ cell as
 stable/unstable/no-fixed-point, but a single 2-D classification map does not
 show \emph{how} the fixed point loses stability as a parameter is varied
 continuously. \texttt{plotBifurcationDiagrams()} slices two 1-D bifurcation
-diagrams directly out of that same grid -- no new integration, just a row
-and a column read back out -- both passing through the representative
+diagrams directly out of that same grid. Both pass through the representative
 stable cell: $y^\ast$ and $P'(y^\ast)$ vs.\ $\theta_{TD}$ at fixed
 $k\approx20114$ N/m, and vs.\ $k$ at fixed $\theta_{TD}\approx70.96^\circ$
 (Figure~\ref{fig:bifurcation}).
