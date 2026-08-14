@@ -98,6 +98,62 @@
     \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 1.png}
 \end{figure}
 
+\subsection*{(a) Rotation matrix $C$}
+
+\[
+R(\psi)=\begin{bmatrix}\cos\psi&\sin\psi&0\\-\sin\psi&\cos\psi&0\\0&0&1\end{bmatrix}, \quad
+R(\theta)=\begin{bmatrix}1&0&0\\0&\cos\theta&\sin\theta\\0&-\sin\theta&\cos\theta\end{bmatrix}, \quad
+R(\phi)=\begin{bmatrix}\cos\phi&\sin\phi&0\\-\sin\phi&\cos\phi&0\\0&0&1\end{bmatrix}
+\]
+\[
+C=R(\phi)\,R(\theta)\,R(\psi)
+\]
+
+Intermediate product:
+\[
+R(\theta)R(\psi)=\begin{bmatrix}
+\cos\psi & \sin\psi & 0\\
+-\sin\psi\cos\theta & \cos\psi\cos\theta & \sin\theta\\
+\sin\psi\sin\theta & -\cos\psi\sin\theta & \cos\theta
+\end{bmatrix}
+\]
+
+\begin{result}
+\[
+C=\begin{bmatrix}
+\cos\psi\cos\phi-\sin\psi\cos\theta\sin\phi & \sin\psi\cos\phi+\cos\psi\cos\theta\sin\phi & \sin\theta\sin\phi\\[4pt]
+-\cos\psi\sin\phi-\sin\psi\cos\theta\cos\phi & -\sin\psi\sin\phi+\cos\psi\cos\theta\cos\phi & \sin\theta\cos\phi\\[4pt]
+\sin\psi\sin\theta & -\cos\psi\sin\theta & \cos\theta
+\end{bmatrix}
+\]
+\end{result}
+
+\subsection*{(b) Kinematic matrix $B$}
+
+Body-frame angular velocity is the sum of each Euler rate along the axis it turns about, each expressed in the body frame:
+\[
+\vec\omega_B=\dot\phi\begin{bmatrix}0\\0\\1\end{bmatrix}+\dot\theta\,R(\phi)\begin{bmatrix}1\\0\\0\end{bmatrix}+\dot\psi\,R(\phi)R(\theta)\begin{bmatrix}0\\0\\1\end{bmatrix}
+\]
+\[
+R(\phi)\begin{bmatrix}1\\0\\0\end{bmatrix}=\begin{bmatrix}\cos\phi\\-\sin\phi\\0\end{bmatrix}, \qquad
+R(\phi)R(\theta)\begin{bmatrix}0\\0\\1\end{bmatrix}=\begin{bmatrix}\sin\phi\sin\theta\\\cos\phi\sin\theta\\\cos\theta\end{bmatrix}
+\]
+\[
+\vec\omega_B=\underbrace{\begin{bmatrix}\sin\phi\sin\theta&\cos\phi&0\\\cos\phi\sin\theta&-\sin\phi&0\\\cos\theta&0&1\end{bmatrix}}_{B^{-1}}\begin{bmatrix}\dot\psi\\\dot\theta\\\dot\phi\end{bmatrix}
+\]
+
+Inverting $B^{-1}$ to solve for $\dot{\vec\theta}$ in terms of $\vec\omega$:
+
+\begin{result}
+\[
+B=\begin{bmatrix}
+\dfrac{\sin\phi}{\sin\theta} & \dfrac{\cos\phi}{\sin\theta} & 0\\[8pt]
+\cos\phi & -\sin\phi & 0\\[8pt]
+-\dfrac{\cos\theta\sin\phi}{\sin\theta} & -\dfrac{\cos\theta\cos\phi}{\sin\theta} & 1
+\end{bmatrix}
+\]
+\end{result}
+
 
 % ====================================================
 % PROBLEM 2
@@ -110,27 +166,72 @@
     \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 2.png}
 \end{figure}
 
+\subsection*{(a) Lagrangian and equations of motion}
 
-% ====================================================
-% PROBLEM 4
-% ====================================================
-\newpage
-\section*{Problem 3}
+From (b), with $\omega_3=\cos\theta\,\dot\psi+\dot\phi$:
+\[
+\omega_1=\sin\phi\sin\theta\,\dot\psi+\cos\phi\,\dot\theta, \qquad
+\omega_2=\cos\phi\sin\theta\,\dot\psi-\sin\phi\,\dot\theta
+\]
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\linewidth]{Figures/Problem Set/Problem 3.png}
-\end{figure}
+Cross terms cancel in $\omega_1^2+\omega_2^2=\sin^2\theta\,\dot\psi^2+\dot\theta^2$, so with $T=\frac12\vec\omega^TI_P\vec\omega$:
 
+\begin{result}
+\[
+T=\frac12I_t\!\left(\sin^2\theta\,\dot\psi^2+\dot\theta^2\right)+\frac12I_a\omega_3^2, \qquad
+V=MgL\cos\theta
+\]
+\[
+\mathcal L=T-V=\frac12I_t\!\left(\sin^2\theta\,\dot\psi^2+\dot\theta^2\right)+\frac12I_a\left(\cos\theta\,\dot\psi+\dot\phi\right)^2-MgL\cos\theta
+\]
+\end{result}
 
-% ====================================================
-% APPENDIX
-% ====================================================
-\newpage
-\appendix
-\section*{Appendix: Code Listings}
+$\phi$: $\dfrac{\partial\mathcal L}{\partial\phi}=0$ (ignorable); $\dfrac{\partial\mathcal L}{\partial\dot\phi}=I_a\omega_3=\text{const}$
 
-\subsection*{Problem 1 Code}
-\CodeListing{../code/Problem1.py}{INSERT .}{lst:p3}
+$\psi$: $\dfrac{\partial\mathcal L}{\partial\psi}=0$ (ignorable); $\dfrac{\partial\mathcal L}{\partial\dot\psi}=I_t\sin^2\theta\,\dot\psi+I_a\omega_3\cos\theta=\text{const}$
+
+$\theta$: $\dfrac{d}{dt}\dfrac{\partial\mathcal L}{\partial\dot\theta}=I_t\ddot\theta$, $\qquad \dfrac{\partial\mathcal L}{\partial\theta}=I_t\sin\theta\cos\theta\,\dot\psi^2-I_a\omega_3\sin\theta\,\dot\psi+MgL\sin\theta$
+
+\begin{result}
+\[
+\ddot\theta=\sin\theta\cos\theta\,\dot\psi^2-\frac{I_a}{I_t}\omega_3\sin\theta\,\dot\psi+\frac{MgL}{I_t}\sin\theta
+\]
+\end{result}
+
+\subsection*{(b) Ignorable coordinates}
+
+\begin{result}
+$\psi$ and $\phi$ are ignorable: $\mathcal L$ has no explicit dependence on either.
+\end{result}
+
+\subsection*{(c) Routhian reduction}
+
+Let $B_\psi=\partial\mathcal L/\partial\dot\psi$, $B_\phi=\partial\mathcal L/\partial\dot\phi$ (both constant, from (a)), and define
+\[
+a=\frac{B_\psi}{I_t}=\sin^2\theta\,\dot\psi+b\cos\theta, \qquad
+b=\frac{B_\phi}{I_t}=\frac{I_a}{I_t}\omega_3
+\]
+
+\begin{result}
+\[
+\dot\psi=\frac{a-b\cos\theta}{\sin^2\theta}
+\]
+\end{result}
+
+From $\omega_3=\cos\theta\,\dot\psi+\dot\phi=(I_t/I_a)b$:
+
+\begin{result}
+\[
+\dot\phi=\frac{I_tb}{I_a}-\frac{a\cos\theta-b\cos^2\theta}{\sin^2\theta}
+\]
+\end{result}
+
+Substituting $\dot\psi$ into the $\theta$ equation of (a) (with $b$ in place of $\tfrac{I_a}{I_t}\omega_3$):
+
+\begin{result}
+\[
+\ddot\theta=\frac{\cos\theta\left(a-b\cos\theta\right)^2}{\sin^3\theta}-\frac{b\left(a-b\cos\theta\right)}{\sin\theta}+\frac{MgL}{I_t}\sin\theta
+\]
+\end{result}
 
 \end{document}
