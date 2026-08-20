@@ -1,4 +1,6 @@
 import os
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
@@ -6,45 +8,50 @@ import matplotlib.pyplot as plt
 FIG_DIR = os.path.join(os.path.dirname(__file__), '..', 'latex', 'Figures', 'Graphs', 'Problem1')
 os.makedirs(FIG_DIR, exist_ok=True)
 
-g = 9.81
+g, l = 9.81, 1.0
+Omega_crit = np.sqrt(48/79 * g/l)
+print(f"Omega_crit = {Omega_crit:.4f} rad/s")
 
 
-def hamilton_deriv(t, y, m, M, L, g):
-    theta, phi, p_theta, p_phi = y
-    c, s = np.cos(theta), np.sin(theta)
-    theta_dot = p_theta / (2*L**2*(m + 2*M*c**2))
-    phi_dot = p_phi / (2*m*L**2*c**2)
-    p_theta_dot = (-M*p_theta**2*s*c/(L**2*(m + 2*M*c**2)**2)
-                    - p_phi**2*s/(2*m*L**2*c**3)
-                    + 2*(m+M)*g*L*c)
-    return [theta_dot, phi_dot, p_theta_dot, 0.0]
+def theta_ddot(theta, Omega):
+    return (79/81)*Omega**2*np.sin(theta)*np.cos(theta) - (16/27)*(g/l)*np.sin(theta)
 
-m, M, L = 1.0, 2.0, 1.0
-theta0, phi0, ptheta0, pphi0 = 0.3, 0.0, 0.0, 3.0
-t_end_g = 10.0
-t_eval_g = np.linspace(0, t_end_g, 3000)
 
-sol = solve_ivp(hamilton_deriv, [0, t_end_g], [theta0, phi0, ptheta0, pphi0],
-                args=(m, M, L, g), t_eval=t_eval_g, method='DOP853', rtol=1e-10, atol=1e-12)
-theta, phi, p_theta, p_phi = sol.y
-phi_dot = p_phi / (2*m*L**2*np.cos(theta)**2)
+def deriv(t, state, Omega):
+    theta, thetadot = state
+    return [thetadot, theta_ddot(theta, Omega)]
 
-H = (p_theta**2/(4*L**2*(m + 2*M*np.cos(theta)**2)) + p_phi**2/(4*m*L**2*np.cos(theta)**2)
-     - 2*(m+M)*g*L*np.sin(theta))
-print(f"max relative drift in H: {np.max(np.abs(H - H[0]))/abs(H[0]):.3e}")
 
-fig, ax = plt.subplots(4, 1, sharex=True, figsize=(8, 9))
-ax[0].plot(sol.t, theta); ax[0].set_ylabel(r'$\theta$ (rad)')
-ax[1].plot(sol.t, phi); ax[1].set_ylabel(r'$\phi$ (rad)')
-ax[2].plot(sol.t, p_theta); ax[2].set_ylabel(r'$p_\theta$')
-ax[3].plot(sol.t, p_phi); ax[3].set_ylabel(r'$p_\phi$'); ax[3].set_xlabel('t (s)')
-ax[0].set_title('Part (g): generalized coordinates and momenta vs time')
-fig.tight_layout(); fig.savefig(os.path.join(FIG_DIR, 'partG_qp_vs_t.png'), dpi=140)
+def phase_portrait(ax, Omega, title):
+    t_span = [0, 20]
+    t_eval = np.linspace(*t_span, 4000)
 
-fig, ax = plt.subplots(figsize=(6, 5))
-ax.plot(theta, phi_dot)
-ax.set_xlabel(r'$\theta$ (rad)'); ax.set_ylabel(r'$\dot\phi$ (rad/s)')
-ax.set_title(r'Part (g): $\theta$ vs $\dot\phi$')
-fig.tight_layout(); fig.savefig(os.path.join(FIG_DIR, 'partG_theta_vs_phidot.png'), dpi=140)
+    # librating orbits released from rest at various theta0
+    for theta0 in np.linspace(-2.6, 2.6, 11):
+        if abs(theta0) < 1e-3:
+            continue
+        sol = solve_ivp(deriv, t_span, [theta0, 0.0], args=(Omega,),
+                         t_eval=t_eval, method='DOP853', rtol=1e-10, atol=1e-12)
+        ax.plot(sol.y[0], sol.y[1], color='C0', lw=0.8)
 
-plt.show()
+    # trajectories launched from theta=0 with a range of angular velocities,
+    # tracing out the separatrix and the circulating orbits beyond it
+    for thetadot0 in [-2.5, -1.5, -0.6, 0.6, 1.5, 2.5]:
+        sol = solve_ivp(deriv, t_span, [0.0, thetadot0], args=(Omega,),
+                         t_eval=t_eval, method='DOP853', rtol=1e-10, atol=1e-12)
+        ax.plot(sol.y[0], sol.y[1], color='C1', lw=0.8)
+
+    ax.plot(0, 0, 'ko', ms=4)
+    ax.set_xlabel(r'$\theta$ (rad)')
+    ax.set_ylabel(r'$\dot\theta$ (rad/s)')
+    ax.set_title(title)
+    ax.set_xlim(-2.8, 2.8)
+
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 5))
+phase_portrait(axes[0], 0.7*Omega_crit, r'$\Omega=0.7\,\Omega_{crit}$: $\theta=0$ a center')
+phase_portrait(axes[1], 1.3*Omega_crit, r'$\Omega=1.3\,\Omega_{crit}$: $\theta=0$ a saddle')
+fig.suptitle('Part (e): phase portrait before and after the bifurcation')
+fig.tight_layout()
+fig.savefig(os.path.join(FIG_DIR, 'partE_phase_portrait.png'), dpi=140)
+print("done")
