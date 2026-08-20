@@ -258,7 +258,7 @@ First, imagine the coin to be laying flat on the ground. Rotate the heading of t
 
     $r=1$, $M=1$; $\theta_0=1.2$, $\psi_0=\phi_0=0$, $\dot\theta_0=0$, $\dot\psi_0=1.5$, with $\dot x_0,\dot y_0$ from part (d).
 
-    The problem says otherwise to take initial conditions equal to $0$, so I first ran that literal case, $\dot\phi_0=0$, to check it. With no spin the coin still nutates periodically (Figure~\ref{fig:zerospin}, period $\approx1.5$~s), but it's large-amplitude: $\theta$ repeatedly swings all the way from $1.2$ down to $0.151$~rad, i.e.\ $z=r\sin\theta$ repeatedly drops from $0.932$ to $0.151$ — the coin is being carried down close to lying flat on every cycle, the point at which the point-contact rolling-on-edge model stops describing the physical situation well. So $\dot\phi_0=0$ is not a meaningful rolling initial condition here, and a nonzero spin is needed to keep the nutation to a small, edge-like range.
+    The problem says otherwise to take initial conditions equal to $0$, so I first ran that literal case, $\dot\phi_0=0$, to check it. With no spin the coin still nutates periodically (Figure~\ref{fig:zerospin}, period $\approx1.5$~s), but it's large-amplitude: $\theta$ repeatedly swings all the way from $1.2$ down to $0.151$~rad, i.e.\ $z=r\sin\theta$ repeatedly drops from $0.932$ to $0.151$. The coin is being carried down close to lying flat on every cycle, the point at which the point-contact rolling-on-edge model stops describing the physical situation well. So $\dot\phi_0=0$ is not a meaningful rolling initial condition here, and a nonzero spin is needed to keep the nutation to a small, edge-like range.
 
     \begin{figure}[H]
         \centering
@@ -285,7 +285,7 @@ First, imagine the coin to be laying flat on the ground. Rotate the heading of t
 
     Nutates between $\theta\approx0.92$ and $1.2$~rad while rolling on a large circular arc of radius $\approx10.9$~m (fit to the trajectory above).
 
-    That radius is worth checking against $v=r(\dot\phi+\dot\psi\cos\theta)$. Doing this with the instantaneous $v(0)\approx6.5$~m/s and the initial rate $\dot\psi_0=1.5$~rad/s is not a valid comparison — $\dot\psi$ oscillates with $\theta$ rather than staying constant, so mixing one instant of $v$ with a different, time-averaged rate isn't a like-for-like check (it happens to land near $4.4$~m, off from the fitted radius by more than a factor of two). The consistent version compares two time-averaged quantities: the total arc length traveled, $\int v\,dt\approx99.0$~m, against the total heading change over the same run, $|\Delta\psi|\approx9.10$~rad, giving $\int v\,dt/|\Delta\psi|\approx10.9$~m — matching the fitted radius of $10.9$~m.
+    That radius is worth checking against $v=r(\dot\phi+\dot\psi\cos\theta)$. Doing this with the instantaneous $v(0)\approx6.5$~m/s and the initial rate $\dot\psi_0=1.5$~rad/s is not a valid comparison: $\dot\psi$ oscillates with $\theta$ rather than staying constant, so mixing one instant of $v$ with a different, time-averaged rate isn't a like-for-like check (it happens to land near $4.4$~m, off from the fitted radius by more than a factor of two). The consistent version compares two time-averaged quantities: the total arc length traveled, $\int v\,dt\approx99.0$~m, against the total heading change over the same run, $|\Delta\psi|\approx9.10$~rad, giving $\int v\,dt/|\Delta\psi|\approx10.9$~m, matching the fitted radius of $10.9$~m.
 
 \end{enumerate}
 
