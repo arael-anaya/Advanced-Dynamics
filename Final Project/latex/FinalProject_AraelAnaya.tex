@@ -118,80 +118,75 @@
 The spring-loaded inverted pendulum (SLIP) is the reduced-order model
 behind most legged-robot dynamics \cite{full1999,saranli2001}: a point
 mass bouncing on a massless spring leg. Despite its simplicity, it
-captures the center-of-mass dynamics of running in both animals and
+captures the center-of-mass dynamics of running in animals and
 machines remarkably well \cite{blickhan1989,mcmahon1990}. That makes it
-a good subject for this course: it is simple enough to analyze fully
-with the tools we covered, but rich enough to produce genuinely
-interesting hybrid dynamics. It also builds directly on the elastic
-pendulum studied in class, since the stance phase of SLIP is an
-inverted spring pendulum.
+a good subject for this course: simple enough to analyze fully with
+the tools we covered, but rich enough to produce interesting hybrid
+dynamics, and it builds directly on the elastic pendulum studied in
+class, since the stance phase of SLIP is an inverted spring pendulum.
 
-What makes SLIP interesting from a mechanics standpoint is
-that it is a hybrid dynamical system: during stance the body behaves
-like a spring-loaded pendulum, while in flight it is a free projectile,
-with the two phases connected by touchdown and liftoff switching
-conditions. Rather than analyzing stability at a fixed equilibrium
-point, the more natural question for a hopping gait is whether the
-periodic motion itself is stable. The standard tool for that is the
-apex return map, a Poincar\'e map in which a steady hopping gait
+SLIP is mechanically interesting as a hybrid dynamical system: during
+stance the body behaves like a spring-loaded pendulum, while in flight
+it is a free projectile, with the two phases connected by touchdown
+and liftoff switching conditions. For a hopping gait, the natural
+stability question is not about a fixed equilibrium but about whether
+the periodic motion itself is stable. The standard tool for that is
+the apex return map, a Poincar\'e map in which a steady hopping gait
 appears as a fixed point whose stability can be assessed numerically
 \cite{blickhan1989,schwind2000}.
 
-Beyond being a convenient system, SLIP-type models are used
-directly in the design and control of running robots and in the
-biomechanical study of animal and human locomotion, which is my
-practical motivation for this project: a model simple enough to
-analyze by hand but predictive enough to inform how a real legged
-system should be built or controlled.
+Beyond being a convenient system, SLIP-type models are used directly
+in the design and control of running robots and in the biomechanical
+study of animal and human locomotion -- my practical motivation for
+this project: a model simple enough to analyze by hand but predictive
+enough to inform how a real legged system should be built or
+controlled.
 
 \subsection*{Relation to Prior Work}
-This project works within an established line of SLIP research, and
+This project works within an established line of SLIP research;
 each stage of the model draws on a different part of that literature.
 Blickhan \cite{blickhan1989} introduced the spring-mass template and
-showed that it reproduces the ground-reaction-force and center-of-mass
+showed it reproduces the ground-reaction-force and center-of-mass
 patterns of human and animal running; the stance-phase Lagrangian
-derived here reproduces that same reduced-order model, but from
-Lagrange's equations in polar coordinates rather than Blickhan's
-Newtonian force balance. McMahon and Cheng \cite{mcmahon1990} used the
-same template to relate leg stiffness to running speed empirically;
-the parameter sweep over stiffness $k$ and touchdown angle
-$\theta_{TD}$ planned for this project asks the same question, but
-numerically, from the model directly, rather than from experimental
-data. Full and Koditschek's templates-and-anchors framework
-\cite{full1999} is the justification for treating SLIP as a legitimate
-object of study on its own, rather than only as a shortcut on the way
-to a fully articulated, multi-link leg model: a template is expected
-to capture the essential dynamics of the anchored system while
-discarding detail that does not matter for stability. Schwind and
-Koditschek \cite{schwind2000} derived an approximate, closed-form
-stance map for SLIP using a perturbative solution; this project instead
-integrates the stance-phase equations numerically with an event-based
-solver, trading their analytical insight for an exact (if less
-interpretable) stance map, consistent with the computational tools
-emphasized in this course. Saranli, Buehler, and Koditschek
-\cite{saranli2001} built RHex, a hexapod whose individual legs behave
-like a SLIP template during stance, which is the practical grounding
-for why this abstraction is worth studying: it is not just a toy
-system, it is the model actually used to understand a working robot.
+derived here reproduces the same model, but from Lagrange's equations
+in polar coordinates rather than Blickhan's Newtonian force balance.
+McMahon and Cheng \cite{mcmahon1990} used the same template to relate
+leg stiffness to running speed empirically; the parameter sweep over
+stiffness $k$ and touchdown angle $\theta_{TD}$ planned here asks the
+same question numerically, from the model directly, rather than from
+experimental data. Full and Koditschek's templates-and-anchors
+framework \cite{full1999} justifies treating SLIP as a legitimate
+object of study on its own, not just a shortcut toward a fully
+articulated multi-link leg model: a template is expected to capture
+the essential dynamics of the anchored system while discarding detail
+that does not matter for stability. Schwind and Koditschek
+\cite{schwind2000} derived an approximate, closed-form stance map
+using a perturbative solution; this project instead integrates the
+stance-phase equations numerically with an event-based solver, trading
+their analytical insight for an exact (if less interpretable) stance
+map, consistent with this course's computational emphasis. Saranli,
+Buehler, and Koditschek \cite{saranli2001} built RHex, a hexapod whose
+legs behave like a SLIP template during stance -- the practical
+grounding for why this abstraction is worth studying: not just a toy
+system, but the model actually used to understand a working robot.
 Finally, Geyer, Seyfarth, and Blickhan \cite{geyer2006} extended a
 SLIP-type compliant-leg model to walking, not just running, by allowing
-double support; that extension is a natural direction for future work
-beyond the single-support hopping model considered here.
+double support -- a natural direction for future work beyond the
+single-support hopping model considered here.
 
 % ====================================================
 % 2. MODELING OF DYNAMICS
 % ====================================================
 \section{Modeling of Dynamics}
 
-The equations of motion for both phases of the SLIP model are derived
-using \textbf{Lagrange's equations of motion}, with generalized
-coordinates chosen separately for each phase: Cartesian coordinates
-$(x,y)$ for the flight phase, and polar coordinates $(r,\theta)$ about
-the planted foot for the stance phase. The two phases are connected by
-touchdown and liftoff switching (transversality) conditions, so the
-overall model is a hybrid dynamical system integrated with event-based
-numerical methods. Figure~\ref{fig:progress} shows the geometry of
-both phases.
+The equations of motion for both phases are derived using
+\textbf{Lagrange's equations of motion}, with generalized coordinates
+chosen separately per phase: Cartesian coordinates $(x,y)$ for flight,
+and polar coordinates $(r,\theta)$ about the planted foot for stance.
+The two phases are connected by touchdown and liftoff switching
+(transversality) conditions, so the overall model is a hybrid
+dynamical system integrated with event-based numerical methods.
+Figure~\ref{fig:progress} shows the geometry of both phases.
 
 \begin{figure}[H]
     \centering
@@ -343,7 +338,7 @@ $y(t)=y_{LO}+\dot y_{LO}t-\tfrac g2t^2$ to $t=t_{apex}$:
 Both are exact: $v_{x,n+1}=\dot x_{LO}$ since horizontal motion is
 unforced in flight ($\ddot x=0$), and $\dot y_{n+1}=0$ by construction
 of $t_{apex}$. $x_{LO}$ is measured relative to the stance foot just
-released rather than a fixed ground origin. THis is consistent, since $x$
+released rather than a fixed ground origin. This is consistent, since $x$
 never enters the dynamics of either phase (Section~2.7).
 
 \subsection{Conserved Energy at Apex and Across a Full Hop Cycle}
@@ -357,11 +352,11 @@ with no spring term, since the leg carries no elastic energy while
 airborne. This differs from the stance energy
 $E_{stance}=\tfrac12m(\dot r^2+r^2\dot\theta^2)+mgr\sin\theta
 +\tfrac12k(r-r_0)^2$ only by that spring term, which vanishes at
-$r=r_0$ -- exactly the touchdown and liftoff condition. The two
-functionals therefore agree at every switching event, so total
-mechanical energy is continuous across touchdown and liftoff, and
-conserved over the full cycle apex $\to$ touchdown $\to$ stance $\to$
-liftoff $\to$ apex. Section~4.2 validates this numerically.
+$r=r_0$ -- exactly the touchdown and liftoff condition -- so the two
+functionals agree at every switching event: total mechanical energy is
+continuous across touchdown and liftoff, and conserved over the full
+cycle apex $\to$ touchdown $\to$ stance $\to$ liftoff $\to$ apex
+(validated numerically in Section~4.2).
 
 \subsection{Dimension Reduction of the Apex State}
 At apex, $\dot y=0$ by definition. Substituting into the apex energy
@@ -378,8 +373,8 @@ of Section~2.6 and solving for $\dot x$:
 So the apex state $(x,y,\dot x,\dot y)$ is not four independent
 numbers: $\dot y=0$ always, $x$ is ignorable (it enters no potential
 or force in either phase), and $\dot x$ is fixed by $y$ once $E$ is
-fixed. At fixed $E$, the apex state collapses to the scalar $y$, and
-the hop-to-hop dynamics reduce to the one-dimensional map
+fixed, collapsing the apex state to the scalar $y$ and reducing the
+hop-to-hop dynamics to the one-dimensional map
 \[
     y_{n+1} = P(y_n)
 \]
@@ -398,9 +393,9 @@ fixed total energy $E$:
 \[
     P: y_n \mapsto y_{n+1}
 \]
-$E$ characterizes how energetic a gait is; $k$ and $\theta_{TD}$ are
-the model's only free parameters. There is no controller, so a
-periodic gait at a given $E$ is whatever $P$ produces for a chosen
+$E$ characterizes how energetic a gait is, and $k$, $\theta_{TD}$ are
+the model's only free parameters; with no controller, a periodic gait
+at a given $E$ is whatever $P$ produces for a chosen
 $(k,\theta_{TD})$.
 
 A periodic gait is a fixed point $y^\ast=P(y^\ast)$, equivalently a
@@ -412,7 +407,7 @@ Local stability is governed by the derivative at the fixed point,
 estimated by a central finite difference:
 \[
     P'(y^\ast) \approx \frac{P(y^\ast+dy)-P(y^\ast-dy)}{2\,dy}
-\]
+\]p
 \[
     |P'(y^\ast)|<1: \text{ stable}, \qquad |P'(y^\ast)|>1: \text{ unstable}
 \]
@@ -432,49 +427,45 @@ with the tools of this course, each with a corresponding limitation:
 
 \begin{itemize}[leftmargin=1.4em]
     \item \textbf{Planar motion.} The model is restricted to the
-    sagittal plane. Real running involves some lateral and rotational
-    motion of the trunk and legs, which this model cannot capture.
+    sagittal plane; real running involves lateral and rotational
+    trunk/leg motion this model cannot capture.
     \item \textbf{Point mass, massless leg.} All body mass is lumped
-    at a single point, and the leg itself carries no mass or rotational
-    inertia. This isolates the center-of-mass dynamics that SLIP is
-    meant to describe, but discards any effect of leg-swing inertia or
-    trunk pitch, which the templates-and-anchors view
-    \cite{full1999} explicitly treats as detail that a template is
-    allowed to omit.
+    at a single point, and the leg carries no mass or rotational
+    inertia. This isolates the center-of-mass dynamics SLIP is meant
+    to describe, but discards leg-swing inertia and trunk pitch --
+    detail the templates-and-anchors view \cite{full1999} explicitly
+    allows a template to omit.
     \item \textbf{Linear (Hookean) leg spring.} The stance leg is
     modeled as a single ideal linear spring, $F=-k(r-r_0)$, with
-    constant stiffness $k$. Biological and robotic legs have leg
-    stiffness that is nonlinear and can be actively modulated
-    by the neuromuscular system or a controller; treating $k$ as a
-    fixed parameter to be swept is a simplification.
+    constant stiffness $k$. Real leg stiffness is nonlinear and can be
+    actively modulated by the neuromuscular system or a controller, so
+    treating $k$ as a fixed swept parameter is a simplification.
 
     \item \textbf{Fixed touchdown angle held through flight.} $\theta_{TD}$
-    is assumed constant for the entire flight phase, i.e. there is no
-    swing-leg retraction or angle adjustment in response to a
-    disturbance before the foot lands. This is the standard SLIP
+    is held constant through flight -- no swing-leg retraction or
+    angle adjustment before the foot lands. This is the standard SLIP
     assumption, but it means the model's only ``control input'' between
     hops is the touchdown angle chosen before each flight, not a
-    continuous correction during flight.
+    continuous in-flight correction.
     \item \textbf{Instantaneous, rigid, non-slipping foot placement.}
-    Touchdown and liftoff are treated as instantaneous events with no
-    impact losses, and the foot is assumed to stick to the ground
-    (no slipping, no ground compliance) for the duration of stance at
-    a fixed height $y=0$. Real contact involves finite compliance and
-    a friction cone that could, in principle, be violated at high
-    touchdown angles or high speeds.
+    Touchdown and liftoff are instantaneous events with no impact
+    losses, and the foot sticks to the ground (no slipping, no
+    compliance) at a fixed height $y=0$ through stance. Real contact
+    has finite compliance and a friction cone that could, in
+    principle, be violated at high touchdown angles or speeds.
     \item \textbf{No stance-phase dissipation, no aerodynamic drag.}
     The stance-phase Lagrangian has no damping term, so mechanical
-    energy is exactly conserved within a single stance phase (verified
+    energy is exactly conserved within a stance phase (verified
     numerically in Section~\ref{sec:results}); flight is likewise
-    treated as drag-free projectile motion. This was a deliberate
-    choice: it isolates the elastic dynamics of interest and gives a
-    clean, near-machine-precision check on the numerical integrator,
-    at the cost of neglecting the fact that any real leg or running
-    surface dissipates some energy each stride.
+    drag-free projectile motion. This is deliberate: it isolates the
+    elastic dynamics of interest and gives a clean,
+    near-machine-precision integrator check, at the cost of ignoring
+    the energy any real leg or running surface dissipates each
+    stride.
     \item \textbf{Equal rest length at touchdown and liftoff.} The leg
-    is assumed to return to the same natural length $r_0$ between hops,
-    with no active leg extension/retraction actuation changing that
-    rest length from one stance phase to the next.
+    returns to the same natural length $r_0$ between hops, with no
+    active extension/retraction actuation changing rest length from
+    one stance phase to the next.
 \end{itemize}
 
 % ====================================================
@@ -512,10 +503,10 @@ Liftoff   & 1.0000 &  83.48 & $\phantom{-}3.1937$ & $-1.6886$ \\
 \end{tabular}
 \end{center}
 Stance lasts $0.2094\,$s; the leg compresses to $0.7740\,$m ($22.6\%$
-of $r_0$); relative energy drift is $6.46\times10^{-13}$, i.e. machine
-precision, confirming that the integrator and the equations of motion
-in Section~2.3 are consistent. Figure~\ref{fig:stance} plots leg
-length, angle, CoM trajectory, and energy drift for this run.
+of $r_0$); relative energy drift is $6.46\times10^{-13}$ (machine
+precision), confirming the integrator and Section~2.3's equations of
+motion are consistent. Figure~\ref{fig:stance} plots leg length,
+angle, CoM trajectory, and energy drift for this run.
 
 \begin{figure}[H]
     \centering
@@ -585,46 +576,42 @@ $\theta_{TD}=68^\circ$, $k=20000$ N/m is therefore not stable.
 \subsection{Grid Sweep Methodology and Parameter Sweep}
 \texttt{gridSearchFixedPoints()} wraps the pipeline of Section~4.3
 into a function of $(k,\theta_{TD})$ returning $(y^\ast,P'(y^\ast))$,
-or null if no sign change in $f(y)$ is found -- i.e.\ no periodic gait
-exists there at this $E$. Each cell uses its own copy of the parameter
+or null if $f(y)$ has no sign change -- i.e.\ no periodic gait exists
+there at this $E$. Each cell uses its own copy of the parameter
 dictionary, so sweeping $k$ never mutates state shared across cells.
 \texttt{stableBandWidth()} additionally reports the longest run of
-contiguous stable cells along each grid direction, which is used below
-to tell a genuinely narrow stability margin from a coarse-grid
-artifact.
+contiguous stable cells along each grid direction, used below to tell
+a genuinely narrow stability margin from a coarse-grid artifact.
 
 An initial coarse $40\times40$ diagnostic grid over
 $k\in[5000,40000]$ N/m, $\theta_{TD}\in[55^\circ,80^\circ]$ turned up
 only a one-cell-wide staircase of stable cells (band width 2 cells
-along $\theta_{TD}$, 3 along $k$) threading through an otherwise
-unstable field -- too thin to trust at that resolution.
-\texttt{localRefinementSweep()} zoomed a $20\times20$ window
-($\pm2.5^\circ\times\pm2500$ N/m, i.e.\ roughly $4\times$ finer)
-onto a representative stable cell near $k\approx20256$ N/m,
-$\theta_{TD}\approx71.0^\circ$; there the stable band \emph{thickened}
-(3 cells along $\theta_{TD}$, 5 along $k$), meaning the coarse
-staircase was a grid-resolution artifact rather than the true
-boundary shape, so the full sweep needed that finer spacing before its
-shape could be trusted.
+along $\theta_{TD}$, 3 along $k$) through an otherwise unstable field
+-- too thin to trust at that resolution. \texttt{localRefinementSweep()}
+zoomed a $20\times20$ window ($\pm2.5^\circ\times\pm2500$ N/m, roughly
+$4\times$ finer) onto a representative stable cell near
+$k\approx20256$ N/m, $\theta_{TD}\approx71.0^\circ$; there the band
+\emph{thickened} (3 cells along $\theta_{TD}$, 5 along $k$), meaning
+the coarse staircase was a grid-resolution artifact, so the full
+sweep needed that finer spacing to be trustworthy.
 
 The final grid matches that resolution across the whole domain: a
 $133\times95$ sweep ($k\in[5000,40000]$ N/m in steps of
 $\approx265$ N/m, $\theta_{TD}\in[55^\circ,80^\circ]$ in steps of
-$\approx0.27^\circ$; 12{,}635 cells, of which only 5 found no fixed
-point), classified stable/unstable/no-fixed-point in
+$\approx0.27^\circ$; 12{,}635 cells, only 5 with no fixed point),
+classified stable/unstable/no-fixed-point in
 Figure~\ref{fig:stability_sweep}, with the friction-cone floor from
 Section~\ref{sec:apexmapresult} ($\theta_{TD}\ge59^\circ$, $\mu=0.6$)
-overlaid. At this resolution the band widens slightly (3 cells along
-$\theta_{TD}$, 8 along $k$) but is still only a few cells across. A
-second local refinement at the same fine spacing
-(Figure~\ref{fig:stability_refinement}), now centered on the final
-grid's own representative stable cell ($k\approx20114$ N/m,
-$\theta_{TD}\approx70.96^\circ$, where $y^\ast\approx0.9496$ m and
-$P'(y^\ast)\approx0.348$), gives a band width of 3 cells along
-$\theta_{TD}$ and 5 along $k$ -- the same order as the full grid, not
-larger, so the earlier thickening has stopped: the self-stable region
-is a real, if narrow, sliver of $(k,\theta_{TD})$ space at this $E$,
-not an artifact of grid spacing.
+overlaid. The band widens slightly here (3 cells along $\theta_{TD}$,
+8 along $k$) but is still only a few cells across. A second local
+refinement at the same fine spacing (Figure~\ref{fig:stability_refinement}),
+centered on the final grid's own representative stable cell
+($k\approx20114$ N/m, $\theta_{TD}\approx70.96^\circ$,
+$y^\ast\approx0.9496$ m, $P'(y^\ast)\approx0.348$), gives a band width
+of 3 cells along $\theta_{TD}$ and 5 along $k$ -- the same order as
+the full grid, so the earlier thickening has stopped: the self-stable
+region is a real, if narrow, sliver of $(k,\theta_{TD})$ space at this
+$E$, not a grid-spacing artifact.
 
 \begin{figure}[H]
     \centering
@@ -652,9 +639,9 @@ not an artifact of grid spacing.
 \subsection{Apex-Map Iteration: Cobweb Diagrams for the Stable and Unstable Cases}
 \label{sec:cobweb}
 Section~\ref{sec:apexmapresult} and Section~4.4 each report a fixed point and
-a slope, but neither shows what convergence or divergence of the apex map
-actually looks like hop to hop. \texttt{plotApexMapIteration()} does that
-directly by iterating $y_{n+1}=P(y_n)$ from a perturbed initial height and
+a slope, but neither shows what convergence or divergence looks like hop to
+hop. \texttt{plotApexMapIteration()} does that directly by iterating
+$y_{n+1}=P(y_n)$ from a perturbed initial height and
 plotting both the cobweb diagram (the map $P(y)$, the diagonal
 $y_{n+1}=y_n$, and the resulting staircase) and $y_n$ vs.\ hop index $n$, for
 two cases at the same fixed energy $E$: the stable representative cell of
@@ -666,16 +653,15 @@ $y^\ast\approx1.5096$ m, $P'(y^\ast)\approx-2.76$).
 Figure~\ref{fig:apex_iteration} confirms the qualitative prediction of
 Section~2.8 from the sign and magnitude of $P'(y^\ast)$ alone: perturbing the
 stable case by $+0.05$ m produces a monotonic staircase that steps down the
-same side of the diagonal every hop, converging smoothly onto $y^\ast$. That
-this monotonic decay only shows up for a \emph{small} perturbation is itself
-informative: the sweep only certifies \emph{local} stability, and a larger
-perturbation of the same stable fixed point instead wanders through the
-map's global nonlinearity (the hump shape of $P(y)$ visible in the figure)
-before it happens to land back near $y^\ast$, if it does at all. Perturbing
-the unstable case by only $+0.02$ m, by contrast, produces a staircase that
-immediately crosses to the other side of the diagonal every hop and spirals
-outward, consistent with the oscillatory divergence already reported
-qualitatively in Section~\ref{sec:apexmapresult}.
+same side of the diagonal every hop, converging smoothly onto $y^\ast$. This
+monotonic decay only shows up for a \emph{small} perturbation, which is
+itself informative: the sweep only certifies \emph{local} stability, and a
+larger perturbation instead wanders through the map's global nonlinearity
+(the hump shape of $P(y)$ visible in the figure) before it happens to land
+back near $y^\ast$, if it does at all. Perturbing the unstable case by only
+$+0.02$ m, by contrast, produces a staircase that immediately crosses to the
+other side of the diagonal every hop and spirals outward, consistent with
+the oscillatory divergence already reported in Section~\ref{sec:apexmapresult}.
 
 \begin{figure}[H]
     \centering
@@ -692,22 +678,21 @@ qualitatively in Section~\ref{sec:apexmapresult}.
 \label{sec:bifurcation}
 Section~4.4's grid already classifies every $(k,\theta_{TD})$ cell as
 stable/unstable/no-fixed-point, but a single 2-D classification map does not
-show \emph{how} the fixed point loses stability as a parameter is varied
+show \emph{how} the fixed point loses stability as a parameter varies
 continuously. \texttt{plotBifurcationDiagrams()} slices two 1-D bifurcation
-diagrams directly out of that same grid. Both pass through the representative
-stable cell: $y^\ast$ and $P'(y^\ast)$ vs.\ $\theta_{TD}$ at fixed
-$k\approx20114$ N/m, and vs.\ $k$ at fixed $\theta_{TD}\approx70.96^\circ$
+diagrams out of that same grid, both through the representative stable cell:
+$y^\ast$ and $P'(y^\ast)$ vs.\ $\theta_{TD}$ at fixed $k\approx20114$ N/m,
+and vs.\ $k$ at fixed $\theta_{TD}\approx70.96^\circ$
 (Figure~\ref{fig:bifurcation}).
 
 Both slices show the same structure: $y^\ast(\theta_{TD})$ and $y^\ast(k)$
-vary smoothly and almost linearly, with no branching or discontinuity in the
-fixed point itself, so this is not a classical saddle-node or pitchfork
-bifurcation in $y^\ast$. Instead the loss of stability lives entirely in
-$P'(y^\ast)$: it crosses $+1$ sharply at both edges of the narrow stable
-window (the thin green band already visible in Figure~\ref{fig:stability_sweep}),
-confirming that the self-stable region identified by the grid sweep is
-bounded by genuine $|P'(y^\ast)|=1$ crossings at both the $\theta_{TD}$ and
-$k$ edges of the band, not by a grid-resolution artifact.
+vary smoothly and almost linearly, with no branching or discontinuity, so
+this is not a classical saddle-node or pitchfork bifurcation in $y^\ast$.
+Instead the loss of stability lives entirely in $P'(y^\ast)$: it crosses
+$+1$ sharply at both edges of the narrow stable window (the thin green band
+already visible in Figure~\ref{fig:stability_sweep}), confirming that the
+self-stable region is bounded by genuine $|P'(y^\ast)|=1$ crossings at both
+edges of the band, not by a grid-resolution artifact.
 
 \begin{figure}[H]
     \centering
@@ -723,8 +708,8 @@ $k$ edges of the band, not by a grid-resolution artifact.
 
 \subsection{Stance-Phase Portrait}
 \label{sec:phaseportrait}
-Section~1 motivates SLIP as building directly on the elastic pendulum studied
-in class. \texttt{stancePhasePortrait()} makes that connection concrete by
+Section~1 motivates SLIP as building on the elastic pendulum studied in
+class. \texttt{stancePhasePortrait()} makes that connection concrete by
 plotting the stance-phase trajectory in the $(r,\dot r)$ and
 $(\theta,\dot\theta)$ phase planes for several touchdown angles at the same
 fixed apex energy (Figure~\ref{fig:phase_portrait}). Each trajectory is an
@@ -733,9 +718,9 @@ phase space between the touchdown event (circle) and the liftoff event
 (square), not a free-running periodic oscillator -- $r=r_0$ at both
 switching events, but $\dot r$ changes sign in between as the leg compresses
 and rebounds. Steeper touchdown angles produce shorter, less compressed
-arcs that stay close to $r=r_0$ throughout, consistent with a more vertical
-landing imparting less leg compression, while shallower angles compress the
-leg further and sweep through a wider range of $\theta$.
+arcs that stay close to $r=r_0$, consistent with a more vertical landing
+imparting less compression, while shallower angles compress the leg
+further and sweep through a wider range of $\theta$.
 
 \begin{figure}[H]
     \centering
@@ -747,42 +732,23 @@ leg further and sweep through a wider range of $\theta$.
     \label{fig:phase_portrait}
 \end{figure}
 
-\begin{insertBox}{Discussion: interpretation of the sweep results}
-The sweep, its resolution check, and the iteration/bifurcation/phase-portrait
-figures above are all done; what remains is the interpretive write-up:
-\begin{itemize}[leftmargin=1.4em]
-    \item Does the shape of the stable band (stiffness rising with
-    touchdown angle, Figure~\ref{fig:bifurcation}) match the qualitative
-    stiffness--speed trend reported by McMahon and Cheng
-    \cite{mcmahon1990}? Section~\ref{sec:apexmapresult}'s point
-    ($68^\circ$, $20000$ N/m) is unstable and sits just outside the band at
-    that stiffness -- is that representative of the grid, or an outlier
-    chosen before the sweep existed? What does it mean physically that the
-    self-stable region is only a few cells wide even at full resolution --
-    is steady hopping in this model fundamentally fragile, or is this an
-    artifact of holding $\theta_{TD}$ fixed through flight (Section~3) with
-    no swing-leg feedback?
-\end{itemize}
-\end{insertBox}
-
 % ====================================================
 % 5. LESSONS LEARNED
 % ====================================================
 \section{Lessons Learned}
-This project proved to be incredibly informative. It allowed me to dive into a multi-stage dynamic system and taught me
-how to address the state transition conditions in a clear and defined way. It also expanded upon our study of geometric
-dynamics analysis by requiring a different mechanism for the stability comparison. Instead of having to analyze the whole system,
-we only have to look at the points in space that best define our motion. This also drove home that finding a periodic
-solution is not the same as finding a stable one: the fixed point of the apex return map exists whether or not it is
-attracting, so stability has to be checked separately -- and for the validated parameters, it turned out the hopping
-gait was not stable at all.
+This project was informative. It let me work through a multi-stage dynamic system and taught me how to handle state
+transition conditions clearly. It also expanded on our study of geometric dynamics analysis by requiring a different
+stability mechanism: instead of analyzing the whole system, we only need the points in space that best define the
+motion. It also drove home that finding a periodic solution is not the same as finding a stable one: the fixed point
+of the apex return map exists whether or not it is attracting, so stability has to be checked separately -- and for
+the validated parameters, the hopping gait turned out not to be stable at all.
 
-It was also a great project for working through robotics-style problems. The inverted pendulum is a very famous model
-used throughout all of robotics. But with the Lagrangian, this derivation can become relatively simple, opening the
-door for more accurate models. Working through the parameter sweep taught me a practical lesson about trusting
-numerical results, too: the first coarse grid over $(k,\theta_{TD})$ turned up a stable band so thin it could have
-just been a grid-resolution artifact, and only after refining the grid and confirming the band held its width could
-I be confident that the narrow self-stable region was a real feature of the model rather than a numerical accident.
+It was also a good project for working through robotics-style problems. The inverted pendulum is a famous model
+throughout robotics, but with the Lagrangian this derivation becomes relatively simple, opening the door to more
+accurate models. The parameter sweep also taught me a practical lesson about trusting numerical results: the first
+coarse grid over $(k,\theta_{TD})$ turned up a stable band thin enough to be a grid-resolution artifact, and only
+after refining the grid and confirming the band held its width could I be confident the narrow self-stable region
+was a real feature of the model, not a numerical accident.
 
 
 
